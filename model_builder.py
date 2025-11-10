@@ -25,11 +25,13 @@ def build_approx_model(arch):
     layers = []
 
     for i in range(arch['num_conv_layers']):
+        # Each layer uses its own multiplier
+        mul_map = arch['mul_map_files'][i]
         layers.append(FakeApproxConv2D(
             filters=arch['filters'][i],
             kernel_size=(arch['kernels'][i], arch['kernels'][i]),
             activation='relu',
-            mul_map_file=arch['mul_map_file'],
+            mul_map_file=mul_map,
             padding='same'
         ))
         layers.append(tf.keras.layers.MaxPooling2D())

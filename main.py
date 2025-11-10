@@ -53,7 +53,11 @@ def run_nas(search_algo='random', num_trials=5, epochs=5, use_stl=False):
             print(f"Approx accuracy: {result['approx_accuracy']:.4f}")
             print(f"Accuracy drop: {result['exact_accuracy'] - result['approx_accuracy']:.4f}")
         if result['energy']:
-            print(f"Energy: {result['energy']:.4f} mJ")
+            print(f"Total energy: {result['energy']:.4f} mJ")
+        if result['energy_per_layer']:
+            print("Energy per layer:")
+            for layer_info in result['energy_per_layer']:
+                print(f"  Layer {layer_info['layer']}: {layer_info['multiplier']} - {layer_info['energy']:.4f} mJ (power: {layer_info['power']:.3f} mW)")
         if result['stl_robustness'] is not None:
             print(f"STL robustness: {result['stl_robustness']:.4f}")
 

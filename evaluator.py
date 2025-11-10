@@ -21,17 +21,18 @@ def train_and_evaluate(arch, x_train, y_train, x_test, y_test, epochs=10, use_st
     # Evaluate with approximate multipliers if specified
     approx_score = None
     energy = None
+    energy_per_layer = None
     stl_robustness = None
 
-    if arch['mul_map_file']:
+    if arch['mul_map_files']:
         approx_model = build_approx_model(arch)
         approx_model.build(input_shape=(None, 32, 32, 3))
         approx_model.load_weights(weights_file)
         approx_model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
         approx_score = approx_model.evaluate(x_test, y_test, verbose=0)
 
-        # Calculate energy
-        energy = estimate_network_energy(arch)
+        # Calculate energy with per-layer breakdown
+        energy, energy_per_layer = estimate_network_energy(arch)
 
         # Evaluate STL if requested
         if use_stl:
@@ -43,5 +44,6 @@ def train_and_evaluate(arch, x_train, y_train, x_test, y_test, epochs=10, use_st
         'exact_accuracy': exact_score[1],
         'approx_accuracy': approx_score[1] if approx_score else None,
         'energy': energy,
+        'energy_per_layer': energy_per_layer,
         'stl_robustness': stl_robustness
     }

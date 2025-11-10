@@ -25,19 +25,29 @@ def estimate_network_energy(arch, num_operations=1e9):
 
     Returns:
         energy: Energy in mJ (millijoules)
+        energy_per_layer: List of energy per layer
     """
-    power_per_mult = get_multiplier_power(arch['mul_map_file'])  # mW
+    total_energy = 0
+    energy_per_layer = []
 
-    # Estimate total multiplications based on architecture
-    total_mults = 0
+    # Calculate energy for each conv layer with its specific multiplier
     for i in range(arch['num_conv_layers']):
-        # Conv layer: output_size * filters * kernel_size^2
+        mul_map = arch['mul_map_files'][i]
+        power_per_mult = get_multiplier_power(mul_map)  # mW
+
+        # Estimate multiplications for this layer
         filters = arch['filters'][i]
         kernel = arch['kernels'][i]
-        total_mults += filters * kernel * kernel * 1024  # Rough estimate
+        layer_mults = filters * kernel * kernel * 1024  # Rough estimate
 
-    # Energy = Power * Time (assuming 1ns per operation)
-    # E (mJ) = P (mW) * operations * 1e-9 (s) * 1e3 (mJ/J)
-    energy = power_per_mult * total_mults * 1e-6  # mJ
+        # Energy = Power * operations * time
+        layer_energy = power_per_mult * layer_mults * 1e-6  # mJ
+        energy_per_layer.append({
+            'layer': i,
+            'multiplier': mul_map.split('/')[-1],
+            'energy': layer_energy,
+            'power': power_per_mult
+        })
+        total_energy += layer_energy
 
-    return energy
+    return total_energy, energy_per_layer

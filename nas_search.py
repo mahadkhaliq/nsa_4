@@ -54,14 +54,16 @@ def sample_architecture(search_space):
     filters = [random.choice(search_space['filters']) for _ in range(num_layers)]
     kernels = [random.choice(search_space['kernel_sizes']) for _ in range(num_layers)]
     dense = random.choice(search_space['dense_units'])
-    mul_map = random.choice(search_space['mul_map_files'])
+
+    # Each conv layer gets its own multiplier
+    mul_maps = [random.choice(search_space['mul_map_files']) for _ in range(num_layers)]
 
     return {
         'num_conv_layers': num_layers,
         'filters': filters,
         'kernels': kernels,
         'dense_units': dense,
-        'mul_map_file': mul_map
+        'mul_map_files': mul_maps  # Now a list, one per layer
     }
 
 def mutate_architecture(arch, search_space):
