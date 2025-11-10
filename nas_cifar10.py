@@ -23,7 +23,7 @@ SEARCH_SPACE = {
     'filters': [16, 32, 64, 128],
     'kernel_sizes': [3, 5],
     'dense_units': [64, 128, 256],
-    'mul_map_files': [MUL_MAP_PATH + 'mul8u_1JFF.bin', MUL_MAP_PATH + 'mul8u_2KV7.bin']
+    'mul_map_files': [MUL_MAP_PATH + 'mul8i_1AGV.bin', MUL_MAP_PATH + 'mul8u_2AC.bin']
 }
 
 def sample_architecture():
