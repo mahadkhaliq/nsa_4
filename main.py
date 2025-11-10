@@ -27,7 +27,7 @@ SEARCH_SPACE = {
     ]
 }
 
-def run_nas(search_algo='random', num_trials=5, epochs=5):
+def run_nas(search_algo='random', num_trials=5, epochs=5, use_stl=False):
     """Run NAS with specified search algorithm"""
 
     # Get architectures to evaluate
@@ -44,19 +44,18 @@ def run_nas(search_algo='random', num_trials=5, epochs=5):
         print(f"\nTrial {i+1}/{len(architectures)}")
         print(f"Architecture: {arch}")
 
-        exact_acc, approx_acc = train_and_evaluate(arch, x_train, y_train, x_test, y_test, epochs)
-
-        result = {
-            'arch': arch,
-            'exact_accuracy': exact_acc,
-            'approx_accuracy': approx_acc
-        }
+        result = train_and_evaluate(arch, x_train, y_train, x_test, y_test, epochs, use_stl)
+        result['arch'] = arch
         results.append(result)
 
-        print(f"Exact accuracy: {exact_acc:.4f}")
-        if approx_acc:
-            print(f"Approx accuracy: {approx_acc:.4f}")
-            print(f"Accuracy drop: {exact_acc - approx_acc:.4f}")
+        print(f"Exact accuracy: {result['exact_accuracy']:.4f}")
+        if result['approx_accuracy']:
+            print(f"Approx accuracy: {result['approx_accuracy']:.4f}")
+            print(f"Accuracy drop: {result['exact_accuracy'] - result['approx_accuracy']:.4f}")
+        if result['energy']:
+            print(f"Energy: {result['energy']:.4f} mJ")
+        if result['stl_robustness'] is not None:
+            print(f"STL robustness: {result['stl_robustness']:.4f}")
 
     # Find best
     best = max(results, key=lambda x: x['approx_accuracy'] if x['approx_accuracy'] else x['exact_accuracy'])
@@ -67,4 +66,5 @@ def run_nas(search_algo='random', num_trials=5, epochs=5):
     return results
 
 if __name__ == '__main__':
-    results = run_nas(search_algo='random', num_trials=5, epochs=5)
+    # Run with STL monitoring
+    results = run_nas(search_algo='random', num_trials=5, epochs=5, use_stl=True)
