@@ -1,0 +1,85 @@
+import random
+
+def random_search(search_space, num_trials):
+    """Random search: sample architectures randomly"""
+    results = []
+    for _ in range(num_trials):
+        arch = sample_architecture(search_space)
+        results.append(arch)
+    return results
+
+def grid_search(search_space, max_trials=None):
+    """Grid search: try all combinations"""
+    from itertools import product
+
+    num_layers_options = search_space['num_conv_layers']
+    filter_options = search_space['filters']
+    kernel_options = search_space['kernel_sizes']
+    dense_options = search_space['dense_units']
+    mul_map_options = search_space['mul_map_files']
+
+    results = []
+    for num_layers in num_layers_options:
+        for filters_combo in product(filter_options, repeat=num_layers):
+            for kernels_combo in product(kernel_options, repeat=num_layers):
+                for dense in dense_options:
+                    for mul_map in mul_map_options:
+                        arch = {
+                            'num_conv_layers': num_layers,
+                            'filters': list(filters_combo),
+                            'kernels': list(kernels_combo),
+                            'dense_units': dense,
+                            'mul_map_file': mul_map
+                        }
+                        results.append(arch)
+                        if max_trials and len(results) >= max_trials:
+                            return results
+    return results
+
+def evolutionary_search(search_space, population_size, num_generations):
+    """Evolutionary search: evolve population of architectures"""
+    population = [sample_architecture(search_space) for _ in range(population_size)]
+
+    for gen in range(num_generations):
+        # Return population for evaluation
+        yield population
+
+        # Next generation: mutate best performers
+        # (This would need fitness scores from evaluation)
+        population = [mutate_architecture(arch, search_space) for arch in population]
+
+def sample_architecture(search_space):
+    """Sample a random architecture from search space"""
+    num_layers = random.choice(search_space['num_conv_layers'])
+    filters = [random.choice(search_space['filters']) for _ in range(num_layers)]
+    kernels = [random.choice(search_space['kernel_sizes']) for _ in range(num_layers)]
+    dense = random.choice(search_space['dense_units'])
+    mul_map = random.choice(search_space['mul_map_files'])
+
+    return {
+        'num_conv_layers': num_layers,
+        'filters': filters,
+        'kernels': kernels,
+        'dense_units': dense,
+        'mul_map_file': mul_map
+    }
+
+def mutate_architecture(arch, search_space):
+    """Mutate an architecture slightly"""
+    new_arch = arch.copy()
+    mutation_type = random.choice(['filters', 'kernels', 'dense', 'mul_map', 'layers'])
+
+    if mutation_type == 'filters' and new_arch['filters']:
+        idx = random.randint(0, len(new_arch['filters']) - 1)
+        new_arch['filters'][idx] = random.choice(search_space['filters'])
+    elif mutation_type == 'kernels' and new_arch['kernels']:
+        idx = random.randint(0, len(new_arch['kernels']) - 1)
+        new_arch['kernels'][idx] = random.choice(search_space['kernel_sizes'])
+    elif mutation_type == 'dense':
+        new_arch['dense_units'] = random.choice(search_space['dense_units'])
+    elif mutation_type == 'mul_map':
+        new_arch['mul_map_file'] = random.choice(search_space['mul_map_files'])
+    elif mutation_type == 'layers':
+        new_arch = sample_architecture(search_space)
+
+    return new_arch
