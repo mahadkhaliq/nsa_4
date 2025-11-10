@@ -7,7 +7,7 @@ def create_stl_spec():
     - Accuracy should be above threshold
     - Energy should be below threshold
     """
-    spec = rtamt.STLDiscreteTimeSpecification()
+    spec = rtamt.StlDiscreteTimeSpecification()
     spec.name = 'NAS Monitor'
 
     # Define variables
@@ -20,7 +20,7 @@ def create_stl_spec():
     try:
         spec.parse()
         return spec
-    except rtamt.STLParseException as e:
+    except rtamt.RTAMTException as e:
         print(f'STL Parse Exception: {e}')
         return None
 
@@ -34,22 +34,15 @@ def evaluate_stl(accuracy, energy):
     if spec is None:
         return None
 
-    # Create trace
-    trace = {
-        'time': [0],
-        'accuracy': [accuracy],
-        'energy': [energy]
-    }
+    # Update with single timestep
+    spec.pastify()
+    robustness = spec.update(0, [('accuracy', accuracy), ('energy', energy)])
 
-    # Compute robustness
-    robustness = spec.evaluate(['time', 'accuracy', 'energy'],
-                               [trace['time'], trace['accuracy'], trace['energy']])
-
-    return robustness[0][1]  # Return robustness value at time 0
+    return robustness
 
 def create_custom_stl(accuracy_threshold=0.6, energy_threshold=100.0):
     """Create custom STL specification with thresholds"""
-    spec = rtamt.STLDiscreteTimeSpecification()
+    spec = rtamt.StlDiscreteTimeSpecification()
     spec.name = 'Custom NAS Monitor'
 
     spec.declare_var('accuracy', 'float')
@@ -60,6 +53,6 @@ def create_custom_stl(accuracy_threshold=0.6, energy_threshold=100.0):
     try:
         spec.parse()
         return spec
-    except rtamt.STLParseException as e:
+    except rtamt.RTAMTException as e:
         print(f'STL Parse Exception: {e}')
         return None
