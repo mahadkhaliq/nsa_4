@@ -21,10 +21,8 @@ SEARCH_SPACE = {
     'kernel_sizes': [3, 5],
     'dense_units': [64, 128, 256],
     'mul_map_files': [
-        MUL_MAP_PATH + 'mul8u_17C8.bin',   # 0.104 mW - low power
-        MUL_MAP_PATH + 'mul8u_197B.bin',   # 0.206 mW - medium
-        MUL_MAP_PATH + 'mul8u_0AB.bin',    # 0.302 mW - medium-high
-        MUL_MAP_PATH + 'mul8u_1JJQ.bin',   # 0.391 mW - higher accuracy
+        MUL_MAP_PATH + 'mul8u_197B.bin',   # 0.206 mW - medium (good balance)
+        MUL_MAP_PATH + 'mul8u_1JJQ.bin',   # 0.391 mW - higher accuracy (best performing)
     ]
 }
 
@@ -103,5 +101,5 @@ if __name__ == '__main__':
     # Run with STL monitoring using approxAI constraints
     # Qc = 0.70 (70% minimum accuracy)
     # Ec = 50.0 mJ (maximum energy)
-    results = run_nas(search_algo='random', num_trials=30, epochs=20, use_stl=True,
+    results = run_nas(search_algo='random', num_trials=30, epochs=40, use_stl=True,
                      quality_constraint=0.70, energy_constraint=50.0)
