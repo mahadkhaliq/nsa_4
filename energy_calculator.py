@@ -1,16 +1,19 @@
 def get_multiplier_power(mul_map_file):
     """Get power consumption for approximate multiplier from EvoApproxLib
 
-    Power values in mW from EvoApproxLib for 8-bit unsigned multipliers
-    TODO: Fill in actual values from EvoApproxLib CSV/documentation
+    Power values in mW from EvoApproxLib (PDK45, 1V, 25C)
+    Source: https://ehw.fit.vutbr.cz/evoapproxlib
     """
     power_table = {
-        'mul8u_17C8.bin': 0.104,   # From EvoApproxLib website
-        'mul8u_125K.bin': 0.25,    # TODO: Get actual value
-        'mul8u_1JFF.bin': 0.30,    # TODO: Get actual value
-        'mul8u_2AC.bin': 0.35,     # TODO: Get actual value
-        'mul8u_1AGV.bin': 0.28,    # TODO: Get actual value
-        '': 0.45  # Exact multiplier baseline (approximate)
+        'mul8u_17C8.bin': 0.104,   # Low power
+        'mul8u_197B.bin': 0.206,   # Medium power
+        'mul8u_0AB.bin': 0.302,    # Medium-high power
+        'mul8u_1JJQ.bin': 0.391,   # Higher accuracy
+        'mul8u_1JFF.bin': 0.391,   # From EvoApproxLib v1.0
+        'mul8u_125K.bin': 0.35,    # Estimated (TODO: verify)
+        'mul8u_2AC.bin': 0.38,     # Estimated (TODO: verify)
+        'mul8u_1AGV.bin': 0.30,    # Estimated (TODO: verify)
+        '': 0.45  # Exact multiplier baseline
     }
 
     filename = mul_map_file.split('/')[-1] if mul_map_file else ''

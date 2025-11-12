@@ -20,10 +20,10 @@ SEARCH_SPACE = {
     'kernel_sizes': [3, 5],
     'dense_units': [64, 128, 256],
     'mul_map_files': [
-        MUL_MAP_PATH + 'mul8u_125K.bin',
-        MUL_MAP_PATH + 'mul8u_1JFF.bin',
-        MUL_MAP_PATH + 'mul8u_2AC.bin',
-        MUL_MAP_PATH + 'mul8u_17C8.bin'
+        MUL_MAP_PATH + 'mul8u_17C8.bin',   # 0.104 mW - low power
+        MUL_MAP_PATH + 'mul8u_197B.bin',   # 0.206 mW - medium
+        MUL_MAP_PATH + 'mul8u_0AB.bin',    # 0.302 mW - medium-high
+        MUL_MAP_PATH + 'mul8u_1JJQ.bin',   # 0.391 mW - higher accuracy
     ]
 }
 
