@@ -87,33 +87,51 @@ def residual_block_approx(x, filters, mul_map_file, stride=1, name=''):
 
 
 def build_mini_resnet_exact(input_shape=(32, 32, 3), num_classes=10):
-    """Build a mini ResNet-8 with exact multipliers (baseline)"""
+    """Build ResNet-20 for CIFAR-10 with exact multipliers (baseline)
+
+    Architecture from original ResNet paper for CIFAR-10:
+    - 3 stages with [16, 32, 64] filters
+    - 3 residual blocks per stage
+    - Total: 20 layers (1 init + 3*3*2 conv + 1 fc)
+    - Expected accuracy: ~91-92% on CIFAR-10
+    """
     inputs = Input(shape=input_shape, name='input')
 
-    # Initial conv
+    # Initial conv - 16 filters, no pooling for CIFAR-10
     x = Conv2D(16, 3, padding='same', name='init_conv')(inputs)
     x = BatchNormalization(name='init_bn')(x)
     x = Activation('relu', name='init_relu')(x)
 
-    # Stage 1: 2 residual blocks, 16 filters
+    # Stage 1: 3 residual blocks, 16 filters, 32×32 feature maps
     x = residual_block_exact(x, 16, stride=1, name='stage1_block1')
     x = residual_block_exact(x, 16, stride=1, name='stage1_block2')
+    x = residual_block_exact(x, 16, stride=1, name='stage1_block3')
 
-    # Stage 2: 2 residual blocks, 32 filters, downsample
+    # Stage 2: 3 residual blocks, 32 filters, 16×16 feature maps (downsample)
     x = residual_block_exact(x, 32, stride=2, name='stage2_block1')
     x = residual_block_exact(x, 32, stride=1, name='stage2_block2')
+    x = residual_block_exact(x, 32, stride=1, name='stage2_block3')
+
+    # Stage 3: 3 residual blocks, 64 filters, 8×8 feature maps (downsample)
+    x = residual_block_exact(x, 64, stride=2, name='stage3_block1')
+    x = residual_block_exact(x, 64, stride=1, name='stage3_block2')
+    x = residual_block_exact(x, 64, stride=1, name='stage3_block3')
 
     # Output
     x = GlobalAveragePooling2D(name='global_pool')(x)
     outputs = Dense(num_classes, activation='softmax', name='output')(x)
 
-    model = Model(inputs, outputs, name='MiniResNet8_Exact')
+    model = Model(inputs, outputs, name='ResNet20_CIFAR10_Exact')
     return model
 
 
 def build_mini_resnet_approx(input_shape=(32, 32, 3), num_classes=10,
                              mul_map_file='./multipliers/mul8u_197B.bin'):
-    """Build a mini ResNet-8 with approximate multipliers"""
+    """Build ResNet-20 for CIFAR-10 with approximate multipliers
+
+    Same architecture as exact model but with FakeApproxConv2D layers.
+    Tests compatibility of approximate multipliers with ResNet-20.
+    """
     inputs = Input(shape=input_shape, name='input')
 
     # Initial conv - keep exact for stability
@@ -121,19 +139,26 @@ def build_mini_resnet_approx(input_shape=(32, 32, 3), num_classes=10,
     x = BatchNormalization(name='init_bn')(x)
     x = Activation('relu', name='init_relu')(x)
 
-    # Stage 1: 2 residual blocks, 16 filters - APPROXIMATE
+    # Stage 1: 3 residual blocks, 16 filters - APPROXIMATE
     x = residual_block_approx(x, 16, mul_map_file, stride=1, name='stage1_block1')
     x = residual_block_approx(x, 16, mul_map_file, stride=1, name='stage1_block2')
+    x = residual_block_approx(x, 16, mul_map_file, stride=1, name='stage1_block3')
 
-    # Stage 2: 2 residual blocks, 32 filters, downsample - APPROXIMATE
+    # Stage 2: 3 residual blocks, 32 filters - APPROXIMATE
     x = residual_block_approx(x, 32, mul_map_file, stride=2, name='stage2_block1')
     x = residual_block_approx(x, 32, mul_map_file, stride=1, name='stage2_block2')
+    x = residual_block_approx(x, 32, mul_map_file, stride=1, name='stage2_block3')
+
+    # Stage 3: 3 residual blocks, 64 filters - APPROXIMATE
+    x = residual_block_approx(x, 64, mul_map_file, stride=2, name='stage3_block1')
+    x = residual_block_approx(x, 64, mul_map_file, stride=1, name='stage3_block2')
+    x = residual_block_approx(x, 64, mul_map_file, stride=1, name='stage3_block3')
 
     # Output - keep exact
     x = GlobalAveragePooling2D(name='global_pool')(x)
     outputs = Dense(num_classes, activation='softmax', name='output')(x)
 
-    model = Model(inputs, outputs, name='MiniResNet8_Approx')
+    model = Model(inputs, outputs, name='ResNet20_CIFAR10_Approx')
     return model
 
 
@@ -305,15 +330,17 @@ def compare_results(exact_acc, approx_acc):
 def main():
     """Run complete test suite"""
     print("\n" + "="*70)
-    print(" ResNet + FakeApproxConv2D Compatibility Test")
+    print(" ResNet-20 + FakeApproxConv2D Compatibility Test")
     print("="*70)
-    print("\nThis test verifies that approximate multipliers work with ResNet")
-    print("architecture using Functional API and skip connections.")
-    print("\nTest architecture: Mini ResNet-8")
-    print("  - 2 stages")
-    print("  - 2 residual blocks per stage")
-    print("  - 4 approximate conv layers total")
+    print("\nThis test verifies that approximate multipliers work with ResNet-20,")
+    print("the proven CIFAR-10 architecture from the original ResNet paper.")
+    print("\nTest architecture: ResNet-20 for CIFAR-10")
+    print("  - 3 stages: [16, 32, 64] filters")
+    print("  - 3 residual blocks per stage")
+    print("  - 18 approximate conv layers total (9 blocks × 2 conv/block)")
     print("  - Skip connections with Add() layer")
+    print("  - Expected exact accuracy: 91-92% (from paper)")
+    print("  - Expected approx accuracy drop: <5% (target)")
 
     # Test 1: Exact model
     exact_model, exact_acc, weights_file = test_exact_model(epochs=40)
