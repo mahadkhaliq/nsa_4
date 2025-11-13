@@ -162,7 +162,7 @@ def build_mini_resnet_approx(input_shape=(32, 32, 3), num_classes=10,
     return model
 
 
-def load_cifar10_subset(num_samples=5000):
+def load_cifar10_subset(num_samples=50000):
     """Load a small subset of CIFAR-10 for quick testing"""
     print("Loading CIFAR-10 subset...")
     (x_train, y_train), (x_test, y_test) = tf.keras.datasets.cifar10.load_data()
@@ -174,8 +174,8 @@ def load_cifar10_subset(num_samples=5000):
     # Take subset for fast testing
     x_train = x_train[:num_samples]
     y_train = y_train[:num_samples]
-    x_test = x_test[:1000]
-    y_test = y_test[:1000]
+    x_test = x_test[:10000]
+    y_test = y_test[:10000]
 
     print(f"Train samples: {len(x_train)}, Test samples: {len(x_test)}")
     return (x_train, y_train), (x_test, y_test)
