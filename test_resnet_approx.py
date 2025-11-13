@@ -316,7 +316,7 @@ def main():
     print("  - Skip connections with Add() layer")
 
     # Test 1: Exact model
-    exact_model, exact_acc, weights_file = test_exact_model(epochs=5)
+    exact_model, exact_acc, weights_file = test_exact_model(epochs=40)
 
     # Test 2: Approximate model
     approx_model, approx_acc = test_approx_model(weights_file)
