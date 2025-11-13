@@ -21,6 +21,15 @@ import numpy as np
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
+# GPU setup - same as main.py
+physical_devices = tf.config.list_physical_devices('GPU')
+try:
+    tf.config.experimental.set_memory_growth(physical_devices[0], True)
+    print(f"GPU memory growth enabled on {len(physical_devices)} device(s)")
+except:
+    print("Running without GPU memory growth")
+    pass
+
 def residual_block_exact(x, filters, stride=1, name=''):
     """Exact residual block with standard Conv2D"""
     shortcut = x
@@ -167,13 +176,13 @@ def test_exact_model(epochs=5):
 
     print(f"Model parameters: {model.count_params():,}")
 
-    # Train
+    # Train with smaller batch size to avoid GPU memory issues
     print(f"\nTraining for {epochs} epochs...")
     history = model.fit(
         x_train, y_train,
         validation_split=0.1,
         epochs=epochs,
-        batch_size=128,
+        batch_size=32,  # Reduced from 128 to avoid GPU memory issues
         verbose=1
     )
 
