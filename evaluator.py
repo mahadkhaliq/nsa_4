@@ -1,10 +1,13 @@
 import os
-from model_builder import build_model, build_approx_model
+from model_builder import (
+    build_model, build_approx_model,
+    build_resnet20_exact, build_resnet20_approx
+)
 from energy_calculator import estimate_network_energy
 from stl_monitor import evaluate_stl
 
 def train_and_evaluate(arch, x_train, y_train, x_test, y_test, epochs=10, use_stl=False,
-                      quality_constraint=0.70, energy_constraint=50.0):
+                      quality_constraint=0.70, energy_constraint=50.0, use_resnet=False):
     """Train with exact multipliers, evaluate with both exact and approximate
 
     Args:
@@ -15,10 +18,15 @@ def train_and_evaluate(arch, x_train, y_train, x_test, y_test, epochs=10, use_st
         use_stl: Enable STL monitoring with approxAI constraints
         quality_constraint: Qc - minimum accuracy (approxAI)
         energy_constraint: Ec - maximum energy in mJ (approxAI)
+        use_resnet: If True, use ResNet-20; if False, use simple CNN
     """
 
     # Train with exact multipliers
-    model = build_model(arch)
+    if use_resnet:
+        model = build_resnet20_exact()
+    else:
+        model = build_model(arch)
+
     model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
     model.fit(x_train, y_train, validation_split=0.1, epochs=epochs, verbose=0)
 
@@ -36,7 +44,11 @@ def train_and_evaluate(arch, x_train, y_train, x_test, y_test, epochs=10, use_st
     stl_robustness = None
 
     if arch['mul_map_files']:
-        approx_model = build_approx_model(arch)
+        if use_resnet:
+            approx_model = build_resnet20_approx(arch['mul_map_files'])
+        else:
+            approx_model = build_approx_model(arch)
+
         approx_model.build(input_shape=(None, 32, 32, 3))
         approx_model.load_weights(weights_file)
         approx_model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])

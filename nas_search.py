@@ -89,3 +89,25 @@ def mutate_architecture(arch, search_space):
         new_arch = sample_architecture(search_space)
 
     return new_arch
+
+
+def sample_resnet_multipliers(search_space):
+    """Sample multipliers for ResNet-20 (3 stages)
+
+    ResNet-20 has fixed architecture, only multipliers vary per stage.
+    This samples 3 multipliers for [stage1, stage2, stage3].
+
+    Args:
+        search_space: Must contain 'mul_map_files' list
+
+    Returns:
+        Architecture dict with 'mul_map_files' list of 3 multipliers
+    """
+    mul_options = search_space['mul_map_files']
+
+    # Sample 3 multipliers (can be same or different - heterogeneous)
+    mul_maps = [random.choice(mul_options) for _ in range(3)]
+
+    return {
+        'mul_map_files': mul_maps  # [stage1, stage2, stage3]
+    }

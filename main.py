@@ -15,20 +15,33 @@ except:
 
 # Search space
 MUL_MAP_PATH = './multipliers/'
-SEARCH_SPACE = {
+
+# CNN Search Space (for simple CNN architecture)
+SEARCH_SPACE_CNN = {
     'num_conv_layers': [2, 3, 4],
     'filters': [16, 32, 64, 128],
     'kernel_sizes': [3, 5],
     'dense_units': [64, 128, 256],
     'mul_map_files': [
-        MUL_MAP_PATH + 'mul8u_197B.bin',   # 0.206 mW - medium (good balance)
-        MUL_MAP_PATH + 'mul8u_1JJQ.bin',   # 0.391 mW - higher accuracy (best performing)
+        MUL_MAP_PATH + 'mul8u_197B.bin',   # 0.206 mW - medium balance
+        MUL_MAP_PATH + 'mul8u_1JJQ.bin',   # 0.391 mW - best performing
+        MUL_MAP_PATH + 'mul8u_0AB.bin',    # 0.302 mW - medium-high
     ],
-    'use_batch_norm': [True, False]  # Add BatchNorm to search space
+    'use_batch_norm': [True, False]
+}
+
+# ResNet-20 Search Space (for ResNet architecture)
+# ResNet has fixed architecture, only searches multipliers per stage
+SEARCH_SPACE_RESNET = {
+    'mul_map_files': [
+        MUL_MAP_PATH + 'mul8u_197B.bin',   # 0.206 mW - medium balance
+        MUL_MAP_PATH + 'mul8u_1JJQ.bin',   # 0.391 mW - best performing
+        MUL_MAP_PATH + 'mul8u_0AB.bin',    # 0.302 mW - medium-high
+    ]
 }
 
 def run_nas(search_algo='random', num_trials=5, epochs=5, use_stl=False,
-            quality_constraint=0.70, energy_constraint=50.0):
+            quality_constraint=0.70, energy_constraint=50.0, architecture='cnn'):
     """Run NAS with specified search algorithm
 
     Args:
@@ -38,15 +51,32 @@ def run_nas(search_algo='random', num_trials=5, epochs=5, use_stl=False,
         use_stl: Enable STL monitoring (approxAI constraints)
         quality_constraint: Qc - minimum accuracy threshold (approxAI)
         energy_constraint: Ec - maximum energy in mJ (approxAI)
+        architecture: 'cnn' for simple CNN or 'resnet' for ResNet-20
     """
 
+    # Select search space based on architecture
+    use_resnet = (architecture.lower() == 'resnet')
+    search_space = SEARCH_SPACE_RESNET if use_resnet else SEARCH_SPACE_CNN
+
+    print(f"\n{'='*60}")
+    print(f"Architecture: {'ResNet-20' if use_resnet else 'Simple CNN'}")
+    print(f"Search algorithm: {search_algo}")
+    print(f"Trials: {num_trials}, Epochs: {epochs}")
+    print(f"{'='*60}\n")
+
     # Get architectures to evaluate
-    if search_algo == 'random':
-        architectures = random_search(SEARCH_SPACE, num_trials)
-    elif search_algo == 'grid':
-        architectures = grid_search(SEARCH_SPACE, max_trials=num_trials)
+    if use_resnet:
+        # ResNet: sample multiplier combinations for 3 stages
+        from nas_search import sample_resnet_multipliers
+        architectures = [sample_resnet_multipliers(search_space) for _ in range(num_trials)]
     else:
-        raise ValueError(f"Unknown search algorithm: {search_algo}")
+        # CNN: use existing search
+        if search_algo == 'random':
+            architectures = random_search(search_space, num_trials)
+        elif search_algo == 'grid':
+            architectures = grid_search(search_space, max_trials=num_trials)
+        else:
+            raise ValueError(f"Unknown search algorithm: {search_algo}")
 
     results = []
 
@@ -55,7 +85,7 @@ def run_nas(search_algo='random', num_trials=5, epochs=5, use_stl=False,
         print(f"Architecture: {arch}")
 
         result = train_and_evaluate(arch, x_train, y_train, x_test, y_test, epochs,
-                                   use_stl, quality_constraint, energy_constraint)
+                                   use_stl, quality_constraint, energy_constraint, use_resnet)
         result['arch'] = arch
         results.append(result)
 
@@ -99,8 +129,30 @@ def run_nas(search_algo='random', num_trials=5, epochs=5, use_stl=False,
     return results
 
 if __name__ == '__main__':
-    # Run with STL monitoring using approxAI constraints
-    # Qc = 0.70 (70% minimum accuracy)
-    # Ec = 50.0 mJ (maximum energy)
-    results = run_nas(search_algo='random', num_trials=60, epochs=50, use_stl=True,
-                     quality_constraint=0.70, energy_constraint=50.0)
+    # Run NAS with architecture selection
+    # architecture='cnn' for simple CNN
+    # architecture='resnet' for ResNet-20 (approxAI paper architecture - CURRENT DEFAULT)
+
+    # ResNet-20 with STL monitoring (approxAI constraints)
+    # Qc = 0.80 (80% minimum accuracy - ResNet should achieve this)
+    # Ec = 100.0 mJ (maximum energy)
+    results = run_nas(
+        search_algo='random',
+        num_trials=20,
+        epochs=80,
+        use_stl=True,
+        quality_constraint=0.80,
+        energy_constraint=100.0,
+        architecture='resnet'  # Using ResNet-20 from approxAI paper
+    )
+
+    # Example: Switch to CNN (uncomment to use)
+    # results = run_nas(
+    #     search_algo='random',
+    #     num_trials=60,
+    #     epochs=50,
+    #     use_stl=True,
+    #     quality_constraint=0.70,
+    #     energy_constraint=50.0,
+    #     architecture='cnn'
+    # )
