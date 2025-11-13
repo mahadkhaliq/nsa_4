@@ -126,7 +126,7 @@ def build_mini_resnet_exact(input_shape=(32, 32, 3), num_classes=10):
 
 
 def build_mini_resnet_approx(input_shape=(32, 32, 3), num_classes=10,
-                             mul_map_file='./multipliers/mul8u_197B.bin'):
+                             mul_map_file='./multipliers/mul8u_1JJQ.bin'):
     """Build ResNet-20 for CIFAR-10 with approximate multipliers
 
     Same architecture as exact model but with FakeApproxConv2D layers.
@@ -229,7 +229,7 @@ def test_exact_model(epochs=5):
     return model, test_acc, weights_file
 
 
-def test_approx_model(weights_file, mul_map_file='./multipliers/mul8u_197B.bin'):
+def test_approx_model(weights_file, mul_map_file='./multipliers/mul8u_1JJQ.bin'):
     """Test approximate ResNet with pre-trained weights"""
     print("\n" + "="*60)
     print("TEST 2: Approximate ResNet-8 (FakeApproxConv2D)")
