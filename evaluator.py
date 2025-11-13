@@ -23,12 +23,12 @@ def train_and_evaluate(arch, x_train, y_train, x_test, y_test, epochs=10, use_st
 
     # Train with exact multipliers
     if use_resnet:
-        model = build_resnet20_exact()
+        model = build_resnet20_exact(arch)
     else:
         model = build_model(arch)
 
     model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
-    model.fit(x_train, y_train, validation_split=0.1, epochs=epochs, verbose=0)
+    model.fit(x_train, y_train, validation_split=0.1, epochs=epochs, verbose=1)
 
     # Save weights
     weights_file = 'temp_weights.h5'
@@ -45,7 +45,7 @@ def train_and_evaluate(arch, x_train, y_train, x_test, y_test, epochs=10, use_st
 
     if arch['mul_map_files']:
         if use_resnet:
-            approx_model = build_resnet20_approx(arch['mul_map_files'])
+            approx_model = build_resnet20_approx(arch)
         else:
             approx_model = build_approx_model(arch)
 

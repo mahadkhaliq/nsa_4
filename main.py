@@ -30,9 +30,11 @@ SEARCH_SPACE_CNN = {
     'use_batch_norm': [True, False]
 }
 
-# ResNet-20 Search Space (for ResNet architecture)
-# ResNet has fixed architecture, only searches multipliers per stage
+# ResNet Search Space (NAS searches architecture + multipliers)
 SEARCH_SPACE_RESNET = {
+    'num_stages': [2, 3],  # 2 or 3 stages
+    'blocks_per_stage': [2, 3, 4],  # blocks per stage
+    'base_filters': [16, 32],  # starting filters (doubles each stage)
     'mul_map_files': [
         MUL_MAP_PATH + 'mul8u_197B.bin',   # 0.206 mW - medium balance
         MUL_MAP_PATH + 'mul8u_1JJQ.bin',   # 0.391 mW - best performing

@@ -92,22 +92,36 @@ def mutate_architecture(arch, search_space):
 
 
 def sample_resnet_multipliers(search_space):
-    """Sample multipliers for ResNet-20 (3 stages)
+    """Sample ResNet architecture with heterogeneous multipliers
 
-    ResNet-20 has fixed architecture, only multipliers vary per stage.
-    This samples 3 multipliers for [stage1, stage2, stage3].
+    NAS searches for:
+    - Number of stages (2 or 3)
+    - Blocks per stage (2, 3, or 4)
+    - Base filters (16 or 32, doubles each stage)
+    - Multiplier per stage (heterogeneous approximation)
 
     Args:
-        search_space: Must contain 'mul_map_files' list
+        search_space: Dict with 'num_stages', 'blocks_per_stage',
+                     'base_filters', 'mul_map_files'
 
     Returns:
-        Architecture dict with 'mul_map_files' list of 3 multipliers
+        Architecture dict defining the ResNet configuration
     """
-    mul_options = search_space['mul_map_files']
+    # Sample architecture parameters
+    num_stages = random.choice(search_space['num_stages'])
+    blocks_per_stage = random.choice(search_space['blocks_per_stage'])
+    base_filters = random.choice(search_space['base_filters'])
 
-    # Sample 3 multipliers (can be same or different - heterogeneous)
-    mul_maps = [random.choice(mul_options) for _ in range(3)]
+    # Sample multipliers (one per stage - heterogeneous)
+    mul_options = search_space['mul_map_files']
+    mul_maps = [random.choice(mul_options) for _ in range(num_stages)]
+
+    # Build filters list: base_filters * 2^stage_idx
+    filters_per_stage = [base_filters * (2 ** i) for i in range(num_stages)]
 
     return {
-        'mul_map_files': mul_maps  # [stage1, stage2, stage3]
+        'num_stages': num_stages,
+        'blocks_per_stage': blocks_per_stage,
+        'filters_per_stage': filters_per_stage,
+        'mul_map_files': mul_maps  # One per stage
     }

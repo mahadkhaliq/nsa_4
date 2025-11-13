@@ -126,82 +126,91 @@ def residual_block_approx(x, filters, mul_map_file, stride=1, name=''):
     return x
 
 
-def build_resnet20_exact(input_shape=(32, 32, 3), num_classes=10):
-    """Build ResNet-20 for CIFAR-10 with exact multipliers
+def build_resnet20_exact(arch=None, input_shape=(32, 32, 3), num_classes=10):
+    """Build variable ResNet for CIFAR-10 with exact multipliers
 
-    Architecture from approxAI paper and original ResNet paper:
-    - 3 stages with [16, 32, 64] filters
-    - 3 residual blocks per stage
-    - Total: 20 layers (1 init + 3*3*2 conv + 1 fc)
-    - Expected accuracy: ~91-92% on CIFAR-10
+    Args:
+        arch: Architecture dict with 'num_stages', 'blocks_per_stage', 'filters_per_stage'
+              If None, uses default ResNet-20: 3 stages, 3 blocks, [16,32,64] filters
     """
+    # Default to ResNet-20 if no arch specified
+    if arch is None:
+        num_stages = 3
+        blocks_per_stage = 3
+        filters_per_stage = [16, 32, 64]
+    else:
+        num_stages = arch['num_stages']
+        blocks_per_stage = arch['blocks_per_stage']
+        filters_per_stage = arch['filters_per_stage']
+
     inputs = Input(shape=input_shape, name='input')
 
-    # Initial conv - 16 filters
-    x = Conv2D(16, 3, padding='same', name='init_conv')(inputs)
+    # Initial conv
+    x = Conv2D(filters_per_stage[0], 3, padding='same', name='init_conv')(inputs)
     x = BatchNormalization(name='init_bn')(x)
     x = Activation('relu', name='init_relu')(x)
 
-    # Stage 1: 16 filters, 32×32 feature maps
-    x = residual_block_exact(x, 16, stride=1, name='stage1_block1')
-    x = residual_block_exact(x, 16, stride=1, name='stage1_block2')
-    x = residual_block_exact(x, 16, stride=1, name='stage1_block3')
+    # Build stages dynamically
+    for stage_idx in range(num_stages):
+        filters = filters_per_stage[stage_idx]
+        stride = 2 if stage_idx > 0 else 1  # Downsample after first stage
 
-    # Stage 2: 32 filters, 16×16 feature maps
-    x = residual_block_exact(x, 32, stride=2, name='stage2_block1')
-    x = residual_block_exact(x, 32, stride=1, name='stage2_block2')
-    x = residual_block_exact(x, 32, stride=1, name='stage2_block3')
-
-    # Stage 3: 64 filters, 8×8 feature maps
-    x = residual_block_exact(x, 64, stride=2, name='stage3_block1')
-    x = residual_block_exact(x, 64, stride=1, name='stage3_block2')
-    x = residual_block_exact(x, 64, stride=1, name='stage3_block3')
+        for block_idx in range(blocks_per_stage):
+            # First block of stage downsamples, rest maintain size
+            block_stride = stride if block_idx == 0 else 1
+            x = residual_block_exact(
+                x, filters, stride=block_stride,
+                name=f'stage{stage_idx+1}_block{block_idx+1}'
+            )
 
     # Output
     x = GlobalAveragePooling2D(name='global_pool')(x)
     outputs = Dense(num_classes, activation='softmax', name='output')(x)
 
-    model = Model(inputs, outputs, name='ResNet20_CIFAR10_Exact')
+    total_layers = 1 + num_stages * blocks_per_stage * 2 + 1
+    model = Model(inputs, outputs, name=f'ResNet{total_layers}_CIFAR10_Exact')
     return model
 
 
-def build_resnet20_approx(mul_map_files, input_shape=(32, 32, 3), num_classes=10):
-    """Build ResNet-20 for CIFAR-10 with approximate multipliers
+def build_resnet20_approx(arch, input_shape=(32, 32, 3), num_classes=10):
+    """Build variable ResNet for CIFAR-10 with approximate multipliers
 
     Uses heterogeneous multipliers (different per stage) as in approxAI paper.
 
     Args:
-        mul_map_files: List of 3 multiplier files for [stage1, stage2, stage3]
-                      If fewer than 3, reuses the first multiplier
+        arch: Architecture dict with 'num_stages', 'blocks_per_stage',
+              'filters_per_stage', 'mul_map_files'
     """
+    num_stages = arch['num_stages']
+    blocks_per_stage = arch['blocks_per_stage']
+    filters_per_stage = arch['filters_per_stage']
+    mul_map_files = arch['mul_map_files']
+
     inputs = Input(shape=input_shape, name='input')
 
     # Initial conv - keep exact for stability
-    x = Conv2D(16, 3, padding='same', name='init_conv')(inputs)
+    x = Conv2D(filters_per_stage[0], 3, padding='same', name='init_conv')(inputs)
     x = BatchNormalization(name='init_bn')(x)
     x = Activation('relu', name='init_relu')(x)
 
-    # Stage 1: 16 filters - use mul_map_files[0]
-    mul_stage1 = mul_map_files[0] if len(mul_map_files) > 0 else mul_map_files[0]
-    x = residual_block_approx(x, 16, mul_stage1, stride=1, name='stage1_block1')
-    x = residual_block_approx(x, 16, mul_stage1, stride=1, name='stage1_block2')
-    x = residual_block_approx(x, 16, mul_stage1, stride=1, name='stage1_block3')
+    # Build stages dynamically with approximate multipliers
+    for stage_idx in range(num_stages):
+        filters = filters_per_stage[stage_idx]
+        mul_map = mul_map_files[stage_idx]
+        stride = 2 if stage_idx > 0 else 1  # Downsample after first stage
 
-    # Stage 2: 32 filters - use mul_map_files[1]
-    mul_stage2 = mul_map_files[1] if len(mul_map_files) > 1 else mul_map_files[0]
-    x = residual_block_approx(x, 32, mul_stage2, stride=2, name='stage2_block1')
-    x = residual_block_approx(x, 32, mul_stage2, stride=1, name='stage2_block2')
-    x = residual_block_approx(x, 32, mul_stage2, stride=1, name='stage2_block3')
-
-    # Stage 3: 64 filters - use mul_map_files[2]
-    mul_stage3 = mul_map_files[2] if len(mul_map_files) > 2 else mul_map_files[0]
-    x = residual_block_approx(x, 64, mul_stage3, stride=2, name='stage3_block1')
-    x = residual_block_approx(x, 64, mul_stage3, stride=1, name='stage3_block2')
-    x = residual_block_approx(x, 64, mul_stage3, stride=1, name='stage3_block3')
+        for block_idx in range(blocks_per_stage):
+            # First block of stage downsamples, rest maintain size
+            block_stride = stride if block_idx == 0 else 1
+            x = residual_block_approx(
+                x, filters, mul_map, stride=block_stride,
+                name=f'stage{stage_idx+1}_block{block_idx+1}'
+            )
 
     # Output - keep exact
     x = GlobalAveragePooling2D(name='global_pool')(x)
     outputs = Dense(num_classes, activation='softmax', name='output')(x)
 
-    model = Model(inputs, outputs, name='ResNet20_CIFAR10_Approx')
+    total_layers = 1 + num_stages * blocks_per_stage * 2 + 1
+    model = Model(inputs, outputs, name=f'ResNet{total_layers}_CIFAR10_Approx')
     return model
