@@ -102,5 +102,5 @@ if __name__ == '__main__':
     # Run with STL monitoring using approxAI constraints
     # Qc = 0.70 (70% minimum accuracy)
     # Ec = 50.0 mJ (maximum energy)
-    results = run_nas(search_algo='random', num_trials=30, epochs=40, use_stl=True,
+    results = run_nas(search_algo='random', num_trials=60, epochs=50, use_stl=True,
                      quality_constraint=0.70, energy_constraint=50.0)
