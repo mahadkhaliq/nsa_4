@@ -23,7 +23,8 @@ SEARCH_SPACE = {
     'mul_map_files': [
         MUL_MAP_PATH + 'mul8u_197B.bin',   # 0.206 mW - medium (good balance)
         MUL_MAP_PATH + 'mul8u_1JJQ.bin',   # 0.391 mW - higher accuracy (best performing)
-    ]
+    ],
+    'use_batch_norm': [True, False]  # Add BatchNorm to search space
 }
 
 def run_nas(search_algo='random', num_trials=5, epochs=5, use_stl=False,

@@ -58,12 +58,16 @@ def sample_architecture(search_space):
     # Each conv layer gets its own multiplier
     mul_maps = [random.choice(search_space['mul_map_files']) for _ in range(num_layers)]
 
+    # Sample BatchNorm usage if available in search space
+    use_batch_norm = random.choice(search_space['use_batch_norm']) if 'use_batch_norm' in search_space else False
+
     return {
         'num_conv_layers': num_layers,
         'filters': filters,
         'kernels': kernels,
         'dense_units': dense,
-        'mul_map_files': mul_maps  # Now a list, one per layer
+        'mul_map_files': mul_maps,  # Now a list, one per layer
+        'use_batch_norm': use_batch_norm
     }
 
 def mutate_architecture(arch, search_space):
