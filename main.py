@@ -3,6 +3,7 @@ from nas_search import random_search, grid_search
 from evaluator import train_and_evaluate
 from data_loader import load_dataset
 from stl_monitor import check_pareto_optimal
+from bayesian_nas import bayesian_search
 
 physical_devices = tf.config.list_physical_devices('GPU')
 try:
@@ -47,7 +48,7 @@ def run_nas(search_algo='random', num_trials=5, epochs=5, use_stl=False,
     """Run NAS with specified search algorithm
 
     Args:
-        search_algo: 'random' or 'grid'
+        search_algo: 'random', 'grid', or 'bayesian'
         num_trials: Number of architectures to evaluate
         epochs: Training epochs per architecture
         use_stl: Enable STL monitoring (approxAI constraints)
@@ -67,7 +68,13 @@ def run_nas(search_algo='random', num_trials=5, epochs=5, use_stl=False,
     print(f"{'='*60}\n")
 
     # Get architectures to evaluate
-    if use_resnet:
+    bayes_nas = None
+    if search_algo == 'bayesian':
+        # Bayesian optimization - more efficient than random search
+        objective = 'stl_robustness' if use_stl else 'accuracy'
+        architectures, bayes_nas = bayesian_search(search_space, num_trials, objective)
+        print(f"Using Bayesian optimization with objective: {objective}")
+    elif use_resnet:
         # ResNet: sample multiplier combinations for 3 stages
         from nas_search import sample_resnet_multipliers
         architectures = [sample_resnet_multipliers(search_space) for _ in range(num_trials)]
@@ -90,6 +97,10 @@ def run_nas(search_algo='random', num_trials=5, epochs=5, use_stl=False,
                                    use_stl, quality_constraint, energy_constraint, use_resnet)
         result['arch'] = arch
         results.append(result)
+
+        # Update Bayesian optimization if using it
+        if bayes_nas is not None:
+            bayes_nas.update_observations(arch, result)
 
         print(f"Exact accuracy: {result['exact_accuracy']:.4f}")
         if result['approx_accuracy']:
@@ -138,8 +149,13 @@ if __name__ == '__main__':
     # ResNet-20 with STL monitoring (approxAI constraints)
     # Qc = 0.80 (80% minimum accuracy - ResNet should achieve this)
     # Ec = 100.0 mJ (maximum energy)
+    #
+    # Search algorithms:
+    # - 'random': Random sampling (baseline)
+    # - 'bayesian': Bayesian optimization (more efficient, recommended)
+    # - 'grid': Exhaustive grid search (slow, for small spaces)
     results = run_nas(
-        search_algo='random',
+        search_algo='bayesian',  # Changed to Bayesian for better results
         num_trials=20,
         epochs=80,
         use_stl=True,

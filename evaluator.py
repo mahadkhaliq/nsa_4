@@ -1,10 +1,25 @@
 import os
+import tensorflow as tf
+from tensorflow.keras.callbacks import LearningRateScheduler
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from model_builder import (
     build_model, build_approx_model,
     build_resnet20_exact, build_resnet20_approx
 )
 from energy_calculator import estimate_network_energy
 from stl_monitor import evaluate_stl
+
+def lr_schedule(epoch):
+    """Learning rate schedule for ResNet on CIFAR-10
+
+    Reduces LR at epochs 40 and 60 for better convergence
+    """
+    if epoch < 40:
+        return 0.001
+    elif epoch < 60:
+        return 0.0001
+    else:
+        return 0.00001
 
 def train_and_evaluate(arch, x_train, y_train, x_test, y_test, epochs=10, use_stl=False,
                       quality_constraint=0.70, energy_constraint=50.0, use_resnet=False):
@@ -27,8 +42,36 @@ def train_and_evaluate(arch, x_train, y_train, x_test, y_test, epochs=10, use_st
     else:
         model = build_model(arch)
 
-    model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
-    model.fit(x_train, y_train, validation_split=0.1, epochs=epochs, verbose=1)
+    # Compile with learning rate schedule
+    optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
+    model.compile(optimizer=optimizer, loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+
+    # Data augmentation for better accuracy (ResNet standard practice)
+    datagen = ImageDataGenerator(
+        rotation_range=15,
+        width_shift_range=0.1,
+        height_shift_range=0.1,
+        horizontal_flip=True
+    )
+
+    # Split into train/val manually to use with data augmentation
+    val_samples = int(len(x_train) * 0.1)
+    x_val = x_train[-val_samples:]
+    y_val = y_train[-val_samples:]
+    x_train_split = x_train[:-val_samples]
+    y_train_split = y_train[:-val_samples]
+
+    # Train with data augmentation and learning rate schedule
+    callbacks = [LearningRateScheduler(lr_schedule)]
+
+    model.fit(
+        datagen.flow(x_train_split, y_train_split, batch_size=128),
+        validation_data=(x_val, y_val),
+        epochs=epochs,
+        callbacks=callbacks,
+        verbose=1,
+        steps_per_epoch=len(x_train_split) // 128
+    )
 
     # Save weights
     weights_file = 'temp_weights.h5'
