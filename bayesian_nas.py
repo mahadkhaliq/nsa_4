@@ -71,7 +71,8 @@ class BayesianNAS:
             # ResNet architecture
             encoding.append(arch['num_stages'])
             encoding.append(arch['blocks_per_stage'])
-            encoding.append(arch['base_filters'])
+            # Use first filter value (base_filters) from filters_per_stage
+            encoding.append(arch['filters_per_stage'][0])
 
             # Encode multipliers (use index in multiplier list)
             mul_options = self.search_space['mul_map_files']
