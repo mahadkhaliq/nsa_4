@@ -157,9 +157,9 @@ if __name__ == '__main__':
     results = run_nas(
         search_algo='bayesian',  # Changed to Bayesian for better results
         num_trials=20,
-        epochs=80,
+        epochs=30,
         use_stl=True,
-        quality_constraint=0.80,
+        quality_constraint=0.70,
         energy_constraint=100.0,
         architecture='resnet'  # Using ResNet-20 from approxAI paper
     )
