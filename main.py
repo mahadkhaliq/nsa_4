@@ -24,9 +24,9 @@ SEARCH_SPACE_CNN = {
     'kernel_sizes': [3, 5],
     'dense_units': [64, 128, 256],
     'mul_map_files': [
-        MUL_MAP_PATH + 'mul8u_197B.bin',   # 0.206 mW - medium balance
+        #MUL_MAP_PATH + 'mul8u_197B.bin',   # 0.206 mW - medium balance
         MUL_MAP_PATH + 'mul8u_1JJQ.bin',   # 0.391 mW - best performing
-        MUL_MAP_PATH + 'mul8u_0AB.bin',    # 0.302 mW - medium-high
+        #MUL_MAP_PATH + 'mul8u_0AB.bin',    # 0.302 mW - medium-high
     ],
     'use_batch_norm': [True, False]
 }
@@ -37,9 +37,9 @@ SEARCH_SPACE_RESNET = {
     'blocks_per_stage': [2, 3, 4],  # blocks per stage
     'base_filters': [16, 32],  # starting filters (doubles each stage)
     'mul_map_files': [
-        MUL_MAP_PATH + 'mul8u_197B.bin',   # 0.206 mW - medium balance
+        #MUL_MAP_PATH + 'mul8u_197B.bin',   # 0.206 mW - medium balance
         MUL_MAP_PATH + 'mul8u_1JJQ.bin',   # 0.391 mW - best performing
-        MUL_MAP_PATH + 'mul8u_0AB.bin',    # 0.302 mW - medium-high
+        #MUL_MAP_PATH + 'mul8u_0AB.bin',    # 0.302 mW - medium-high
     ]
 }
 
