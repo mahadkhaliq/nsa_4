@@ -151,9 +151,9 @@ if __name__ == '__main__':
     # Ec = 100.0 mJ (maximum energy)
     #
     # Search algorithms:
-    # - 'random': Random sampling (baseline)
-    # - 'bayesian': Bayesian optimization (more efficient, recommended)
-    # - 'grid': Exhaustive grid search (slow, for small spaces)
+    # 'random': Random sampling (baseline)
+    # 'bayesian': Bayesian optimization (more efficient, recommended)
+    # 'grid': Exhaustive grid search (slow, for small spaces)
     results = run_nas(
         search_algo='bayesian',  # Changed to Bayesian for better results
         num_trials=20,
