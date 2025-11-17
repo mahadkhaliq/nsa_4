@@ -26,6 +26,7 @@ SEARCH_SPACE_CNN = {
     'mul_map_files': [
         #MUL_MAP_PATH + 'mul8u_197B.bin',   # 0.206 mW - medium balance
         MUL_MAP_PATH + 'mul8u_1JJQ.bin',   # 0.391 mW - best performing
+        MUL_MAP_PATH + 'mul8u_2V0.bin',    # BEST - 0.0015% MAE, 64% energy saved
         #MUL_MAP_PATH + 'mul8u_0AB.bin',    # 0.302 mW - medium-high
     ],
     'use_batch_norm': [True, False]
@@ -39,9 +40,9 @@ SEARCH_SPACE_RESNET = {
     'mul_map_files': [
         MUL_MAP_PATH + 'mul8u_1JJQ.bin',   # EXACT - 0% error (baseline)
         MUL_MAP_PATH + 'mul8u_2V0.bin',    # BEST - 0.0015% MAE, 64% energy saved
-        MUL_MAP_PATH + 'mul8u_LK8.bin',    # EXCELLENT - 0.0046% MAE, 75% energy saved
-        MUL_MAP_PATH + 'mul8u_R92.bin',    # VERY GOOD - 0.017% MAE, 87.5% energy saved
-        MUL_MAP_PATH + 'mul8u_0AB.bin',    # GOOD - 0.057% MAE, 97.7% energy saved
+        #MUL_MAP_PATH + 'mul8u_LK8.bin',    # EXCELLENT - 0.0046% MAE, 75% energy saved
+        #MUL_MAP_PATH + 'mul8u_R92.bin',    # VERY GOOD - 0.017% MAE, 87.5% energy saved
+        #MUL_MAP_PATH + 'mul8u_0AB.bin',    # GOOD - 0.057% MAE, 97.7% energy saved
     ]
 }
 
@@ -149,7 +150,7 @@ if __name__ == '__main__':
     # architecture='resnet' for ResNet-20 (approxAI paper architecture - CURRENT DEFAULT)
 
     # ResNet-20 with STL monitoring (approxAI constraints)
-    # Qc = 0.80 (80% minimum accuracy - ResNet should achieve this)
+    # Qc = 0.89 (89% minimum accuracy - 2% below baseline 91%, per paper Section V-B)
     # Ec = 100.0 mJ (maximum energy)
     #
     # Search algorithms:
@@ -161,7 +162,7 @@ if __name__ == '__main__':
         num_trials=20,
         epochs=30,
         use_stl=True,
-        quality_constraint=0.70,
+        quality_constraint=0.89,  # Paper: 2% below baseline (91% - 2% = 89%)
         energy_constraint=100.0,
         architecture='resnet'  # Using ResNet-20 from approxAI paper
     )
