@@ -32,11 +32,16 @@ SEARCH_SPACE_CNN = {
     'use_batch_norm': [True, False]
 }
 
-# ResNet Search Space (NAS searches architecture + multipliers)
+# ResNet Search Space
+# BASELINE: ResNet-18 (Paper's exact architecture)
 SEARCH_SPACE_RESNET = {
-    'num_stages': [2, 3],  # 2 or 3 stages
-    'blocks_per_stage': [2, 3, 4],  # blocks per stage
-    'base_filters': [16, 32],  # starting filters (doubles each stage)
+    'num_stages': [4],  # ResNet-18: 4 stages
+    'blocks_per_stage': [2],  # ResNet-18: 2 blocks per stage
+    'base_filters': [64],  # ResNet-18: [64, 128, 256, 512]
+    # NAS: Uncomment lines below for full search
+    #'num_stages': [2, 3],
+    #'blocks_per_stage': [2, 3, 4],
+    #'base_filters': [16, 32],
     'mul_map_files': [
         MUL_MAP_PATH + 'mul8u_1JJQ.bin',   # EXACT - 0% error (baseline)
         MUL_MAP_PATH + 'mul8u_2V0.bin',    # BEST - 0.0015% MAE, 64% energy saved
@@ -147,9 +152,9 @@ def run_nas(search_algo='random', num_trials=5, epochs=5, use_stl=False,
 if __name__ == '__main__':
     # Run NAS with architecture selection
     # architecture='cnn' for simple CNN
-    # architecture='resnet' for ResNet-20 (approxAI paper architecture - CURRENT DEFAULT)
+    # architecture='resnet' for ResNet-18 (approxAI paper architecture - CURRENT DEFAULT)
 
-    # ResNet-20 with STL monitoring (approxAI constraints)
+    # ResNet-18 with STL monitoring (approxAI constraints)
     # Qc = 0.89 (89% minimum accuracy - 2% below baseline 91%, per paper Section V-B)
     # Ec = 100.0 mJ (maximum energy)
     #
