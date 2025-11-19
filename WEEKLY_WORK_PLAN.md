@@ -1,11 +1,5 @@
 Weekly Work Plan: Neural Architecture Search with Approximate Multipliers
 
-Student: [Your Name]
-Advisor: [Advisor Name]
-Period: November 18-22, 2025
-Daily Commitment: 4 hours (Monday-Friday)
-
-
 OBJECTIVES
 
 This week focuses on aligning the implementation with the approxAI paper architecture while debugging current issues and adding visualization capabilities. The main goals are investigating low accuracy (around 70 percent instead of expected 91-92 percent), understanding STL constraint violations, implementing missing plotting functionality, relaxing STL constraints for realistic evaluation, enhancing Bayesian NAS, and gaining overview of differential privacy concepts. The architecture implementation will follow the paper's approach as discussed in meetings.
