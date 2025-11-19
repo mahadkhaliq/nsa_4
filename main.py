@@ -165,11 +165,11 @@ if __name__ == '__main__':
     results = run_nas(
         search_algo='bayesian',  # Changed to Bayesian for better results
         num_trials=20,
-        epochs=30,
+        epochs=80,  # Standard CIFAR-10 training (paper uses 80 epochs)
         use_stl=True,
         quality_constraint=0.89,  # Paper: 2% below baseline (91% - 2% = 89%)
-        energy_constraint=100.0,
-        architecture='resnet'  # Using ResNet-20 from approxAI paper
+        energy_constraint=100.0,  # Placeholder - paper uses Pareto analysis, not hard constraint
+        architecture='resnet'  # Using ResNet-18 from approxAI paper
     )
 
     # Example: Switch to CNN (uncomment to use)

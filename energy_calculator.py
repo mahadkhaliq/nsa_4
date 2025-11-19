@@ -1,60 +1,84 @@
-def get_multiplier_power(mul_map_file):
-    """Get power consumption for approximate multiplier from EvoApproxLib
+def get_multiplier_specs(mul_map_file):
+    """Get power and delay specs for approximate multiplier from EvoApproxLib
 
-    Power values in mW from EvoApproxLib (PDK45, 1V, 25C)
-    Source: https://ehw.fit.vutbr.cz/evoapproxlib
+    Values extracted from PDK45 synthesis (1V, 25C, 45nm process)
+    Source: EvoApproxLib Verilog files - pareto_pwr_wce directory
+    Format: {'power_mW': float, 'delay_ns': float}
     """
-    power_table = {
-        'mul8u_17C8.bin': 0.104,   # Low power
-        'mul8u_197B.bin': 0.206,   # Medium power
-        'mul8u_0AB.bin': 0.302,    # Medium-high power
-        'mul8u_1JJQ.bin': 0.391,   # Higher accuracy
-        'mul8u_1JFF.bin': 0.391,   # From EvoApproxLib v1.0
-        'mul8u_125K.bin': 0.35,    # Estimated (TODO: verify)
-        'mul8u_2AC.bin': 0.38,     # Estimated (TODO: verify)
-        'mul8u_1AGV.bin': 0.30,    # Estimated (TODO: verify)
-        '': 0.45  # Exact multiplier baseline
+    # PDK45 synthesis results for 8x8 unsigned multipliers
+    specs_table = {
+        # Top 5 Pareto-optimal multipliers from approxAI paper
+        'mul8u_1JJQ.bin': {'power_mW': 0.391, 'delay_ns': 1.43},  # EXACT - 0.00% MAE
+        'mul8u_2V0.bin':  {'power_mW': 0.386, 'delay_ns': 1.42},  # BEST - 0.0015% MAE
+        'mul8u_LK8.bin':  {'power_mW': 0.370, 'delay_ns': 1.40},  # 0.0046% MAE
+        'mul8u_R92.bin':  {'power_mW': 0.345, 'delay_ns': 1.41},  # 0.017% MAE
+        'mul8u_0AB.bin':  {'power_mW': 0.302, 'delay_ns': 1.44},  # 0.057% MAE
+
+        # Other multipliers (legacy - not verified from PDK45)
+        'mul8u_197B.bin': {'power_mW': 0.206, 'delay_ns': 1.5},   # Estimated
+        'mul8u_17C8.bin': {'power_mW': 0.104, 'delay_ns': 1.6},   # Estimated
+        '': {'power_mW': 0.391, 'delay_ns': 1.43}  # Default to exact multiplier
     }
 
     filename = mul_map_file.split('/')[-1] if mul_map_file else ''
-    return power_table.get(filename, 0.45)
+    return specs_table.get(filename, specs_table[''])
+
+def calculate_energy_per_mac(multiplier_file):
+    """Calculate energy for one MAC (Multiply-Accumulate) operation in picojoules
+
+    MAC = 1 multiplication + 1 addition
+    Energy = (Multiplier_Power × Multiplier_Delay) + (Adder_Power × Adder_Delay)
+
+    Returns:
+        float: Energy per MAC operation in picojoules (pJ)
+    """
+    # Get multiplier specs from PDK45 synthesis
+    mult_specs = get_multiplier_specs(multiplier_file)
+
+    # 8-bit adder specs (typical values from literature)
+    # Adder is ~10-15% of multiplier power and much faster
+    ADDER_POWER_MW = 0.050  # mW
+    ADDER_DELAY_NS = 0.20   # ns
+
+    # Calculate energy: E = P × t (converted to picojoules)
+    mult_energy_pJ = (mult_specs['power_mW'] * 1e-3) * (mult_specs['delay_ns'] * 1e-9) * 1e12
+    adder_energy_pJ = (ADDER_POWER_MW * 1e-3) * (ADDER_DELAY_NS * 1e-9) * 1e12
+
+    return mult_energy_pJ + adder_energy_pJ
+
+def count_conv_macs(in_channels, out_channels, kernel_size, feature_map_size):
+    """Count MAC operations for a convolutional layer
+
+    Args:
+        in_channels: Number of input channels
+        out_channels: Number of output filters
+        kernel_size: Kernel size (assumes square kernel)
+        feature_map_size: Spatial size of feature map (H×W)
+
+    Returns:
+        int: Total MAC operations
+    """
+    return in_channels * out_channels * (kernel_size ** 2) * feature_map_size
 
 def estimate_network_energy(arch, num_operations=1e9):
-    """Estimate total network energy consumption for CNN or ResNet
+    """Estimate total network energy consumption using MAC-based model
 
     Args:
         arch: Network architecture dict
-              CNN: has 'num_conv_layers', 'filters', 'kernels'
               ResNet: has 'num_stages', 'blocks_per_stage', 'filters_per_stage'
-        num_operations: Estimated number of multiply operations
+              CNN: has 'num_conv_layers', 'filters', 'kernels'
 
     Returns:
-        energy: Energy in mJ (millijoules)
-        energy_per_layer: List of energy per stage/layer
+        energy: Total energy in microjoules (µJ)
+        energy_per_layer: List of dict with energy details per stage/layer
     """
-    total_energy = 0
+    total_energy_pJ = 0
     energy_per_layer = []
 
     if 'num_conv_layers' in arch:
         # CNN architecture - variable layers
-        for i in range(arch['num_conv_layers']):
-            mul_map = arch['mul_map_files'][i]
-            power_per_mult = get_multiplier_power(mul_map)  # mW
-
-            # Estimate multiplications for this layer
-            filters = arch['filters'][i]
-            kernel = arch['kernels'][i]
-            layer_mults = filters * kernel * kernel * 1024  # Rough estimate
-
-            # Energy = Power * operations * time
-            layer_energy = power_per_mult * layer_mults * 1e-6  # mJ
-            energy_per_layer.append({
-                'layer': i,
-                'multiplier': mul_map.split('/')[-1],
-                'energy': layer_energy,
-                'power': power_per_mult
-            })
-            total_energy += layer_energy
+        # TODO: Implement proper MAC counting for CNNs
+        raise NotImplementedError("CNN energy calculation needs proper MAC counting")
 
     else:
         # ResNet architecture - variable stages/blocks
@@ -62,29 +86,56 @@ def estimate_network_energy(arch, num_operations=1e9):
         blocks_per_stage = arch['blocks_per_stage']
         filters_per_stage = arch['filters_per_stage']
 
-        # Feature map sizes (assuming CIFAR-10: 32x32 input, downsample by 2 each stage)
+        # Feature map sizes for CIFAR-10 (32x32 input, stride-2 downsample per stage)
+        # ResNet-18: Stage 0 (32×32), Stage 1 (16×16), Stage 2 (8×8), Stage 3 (4×4)
         feature_map_sizes = [32 * 32 // (2 ** i) for i in range(num_stages)]
+
+        # Initial conv layer (usually 3→64 channels, 3×3 kernel on 32×32)
+        # Assuming first stage handles this
+        in_channels = 3  # RGB input
 
         for stage_idx in range(num_stages):
             mul_map = arch['mul_map_files'][stage_idx]
-            power_per_mult = get_multiplier_power(mul_map)  # mW
+            out_channels = filters_per_stage[stage_idx]
+            feature_map_size = feature_map_sizes[stage_idx]
 
-            # Each residual block has 2 conv layers (3x3)
-            filters = filters_per_stage[stage_idx]
-            feature_map = feature_map_sizes[stage_idx]
-            num_convs = blocks_per_stage * 2  # 2 convs per block
+            # Get energy per MAC for this stage's multiplier
+            energy_per_mac_pJ = calculate_energy_per_mac(mul_map)
 
-            # Estimate multiplications for this stage (all 3x3 convs)
-            stage_mults = filters * 3 * 3 * feature_map * num_convs
+            # Each ResNet block has 2 conv layers (both 3×3)
+            # First conv in block: in_channels → out_channels
+            # Second conv in block: out_channels → out_channels
+            total_macs = 0
 
-            # Energy = Power * operations * time
-            stage_energy = power_per_mult * stage_mults * 1e-6  # mJ
+            for block in range(blocks_per_stage):
+                if block == 0 and stage_idx > 0:
+                    # First block of new stage: downsample with stride=2
+                    # Feature map size already halved in feature_map_sizes
+                    conv1_macs = count_conv_macs(in_channels, out_channels, 3, feature_map_size)
+                else:
+                    # Regular block: no downsampling
+                    conv1_macs = count_conv_macs(in_channels, out_channels, 3, feature_map_size)
+
+                conv2_macs = count_conv_macs(out_channels, out_channels, 3, feature_map_size)
+                total_macs += conv1_macs + conv2_macs
+
+                # After first block, in_channels = out_channels
+                in_channels = out_channels
+
+            # Calculate total energy for this stage
+            stage_energy_pJ = total_macs * energy_per_mac_pJ
+
             energy_per_layer.append({
-                'layer': stage_idx,
+                'stage': stage_idx,
                 'multiplier': mul_map.split('/')[-1],
-                'energy': stage_energy,
-                'power': power_per_mult
+                'macs': total_macs,
+                'energy_per_mac_pJ': energy_per_mac_pJ,
+                'energy_pJ': stage_energy_pJ,
+                'energy_uJ': stage_energy_pJ / 1e6
             })
-            total_energy += stage_energy
+            total_energy_pJ += stage_energy_pJ
 
-    return total_energy, energy_per_layer
+    # Convert total energy from picojoules to microjoules
+    total_energy_uJ = total_energy_pJ / 1e6
+
+    return total_energy_uJ, energy_per_layer
