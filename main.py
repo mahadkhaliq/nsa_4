@@ -4,6 +4,7 @@ from evaluator import train_and_evaluate
 from data_loader import load_dataset
 from stl_monitor import check_pareto_optimal
 from bayesian_nas import bayesian_search
+from logger import NASLogger
 
 physical_devices = tf.config.list_physical_devices('GPU')
 try:
