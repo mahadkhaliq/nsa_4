@@ -64,7 +64,7 @@ def train_and_evaluate(arch, x_train, y_train, x_test, y_test, epochs=10, use_st
     # Train with data augmentation and learning rate schedule
     callbacks = [LearningRateScheduler(lr_schedule)]
 
-    model.fit(
+    history = model.fit(
         datagen.flow(x_train_split, y_train_split, batch_size=128),
         validation_data=(x_val, y_val),
         epochs=epochs,
@@ -112,5 +112,6 @@ def train_and_evaluate(arch, x_train, y_train, x_test, y_test, epochs=10, use_st
         'approx_accuracy': approx_score[1] if approx_score else None,
         'energy': energy,
         'energy_per_layer': energy_per_layer,
-        'stl_robustness': stl_robustness
+        'stl_robustness': stl_robustness,
+        'history': history.history  # Add training history for plotting
     }
