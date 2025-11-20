@@ -4,6 +4,8 @@ from evaluator import train_and_evaluate
 from data_loader import load_dataset
 from stl_monitor import check_pareto_optimal
 from bayesian_nas import bayesian_search
+from logger import NASLogger
+from plotter import setup_plot_dirs, plot_training_curves, plot_energy_breakdown, generate_all_plots
 
 physical_devices = tf.config.list_physical_devices('GPU')
 try:
@@ -69,6 +71,26 @@ def run_nas(search_algo='random', num_trials=5, epochs=5, use_stl=False,
     use_resnet = (architecture.lower() == 'resnet')
     search_space = SEARCH_SPACE_RESNET if use_resnet else SEARCH_SPACE_CNN
 
+    # Initialize logger
+    experiment_name = f"{architecture}_{search_algo}_{epochs}ep"
+    logger = NASLogger(log_dir='logs', experiment_name=experiment_name)
+
+    # Setup plot directories
+    plot_dirs = setup_plot_dirs(experiment_name, base_dir='plots')
+
+    # Log experiment configuration
+    config = {
+        'architecture': 'ResNet-18' if use_resnet else 'Simple CNN',
+        'search_algorithm': search_algo,
+        'num_trials': num_trials,
+        'epochs': epochs,
+        'use_stl': use_stl,
+        'quality_constraint': quality_constraint,
+        'energy_constraint': energy_constraint,
+        'search_space': str(search_space)
+    }
+    logger.log_config(config)
+
     print(f"\n{'='*60}")
     print(f"Architecture: {'ResNet-20' if use_resnet else 'Simple CNN'}")
     print(f"Search algorithm: {search_algo}")
@@ -98,6 +120,9 @@ def run_nas(search_algo='random', num_trials=5, epochs=5, use_stl=False,
     results = []
 
     for i, arch in enumerate(architectures):
+        logger.subheader(f"Trial {i+1}/{len(architectures)}")
+        logger.info(f"Architecture: {arch}")
+
         print(f"\nTrial {i+1}/{len(architectures)}")
         print(f"Architecture: {arch}")
 
@@ -110,6 +135,9 @@ def run_nas(search_algo='random', num_trials=5, epochs=5, use_stl=False,
         if bayes_nas is not None:
             bayes_nas.update_observations(arch, result)
 
+        # Log and print trial results
+        logger.log_trial(i+1, len(architectures), arch, result)
+
         print(f"Exact accuracy: {result['exact_accuracy']:.4f}")
         if result['approx_accuracy']:
             print(f"Approx accuracy: {result['approx_accuracy']:.4f}")
@@ -117,6 +145,7 @@ def run_nas(search_algo='random', num_trials=5, epochs=5, use_stl=False,
         if result['energy']:
             print(f"Total energy: {result['energy']:.4f} µJ")
         if result['energy_per_layer']:
+            logger.log_energy_breakdown(result['energy_per_layer'])
             print("Energy breakdown per stage:")
             for layer_info in result['energy_per_layer']:
                 stage = layer_info.get('stage', layer_info.get('layer', '?'))
@@ -128,11 +157,24 @@ def run_nas(search_algo='random', num_trials=5, epochs=5, use_stl=False,
             status = "SATISFIED" if result['stl_robustness'] > 0 else "VIOLATED"
             print(f"STL robustness: {result['stl_robustness']:.4f} ({status})")
 
+        # Plot training curves if history is available
+        if 'history' in result and result['history']:
+            plot_training_curves(result['history'], trial_num=i+1, save_dir=plot_dirs['training'])
+            logger.info(f"Training curves saved for trial {i+1}")
+
+        # Plot energy breakdown for this trial
+        if result['energy_per_layer']:
+            plot_energy_breakdown(result, trial_num=i+1, save_dir=plot_dirs['energy'])
+            logger.info(f"Energy breakdown plot saved for trial {i+1}")
+
     # Find best by accuracy
     best = max(results, key=lambda x: x['approx_accuracy'] if x['approx_accuracy'] else x['exact_accuracy'])
 
     # Find Pareto-optimal solutions (approxAI methodology)
     pareto_indices = check_pareto_optimal(results)
+
+    # Log summary
+    logger.log_summary(results)
 
     print(f"\n{'='*60}")
     print("Best architecture by accuracy:")
@@ -140,6 +182,7 @@ def run_nas(search_algo='random', num_trials=5, epochs=5, use_stl=False,
     print(f"  Architecture: {best['arch']}")
 
     if pareto_indices:
+        logger.info(f"\nPareto-optimal architectures: {len(pareto_indices)} found")
         print(f"\n{'='*60}")
         print(f"Pareto-optimal architectures ({len(pareto_indices)} found):")
         print("(approxAI: No architecture dominates these in both accuracy AND energy)")
@@ -150,6 +193,37 @@ def run_nas(search_algo='random', num_trials=5, epochs=5, use_stl=False,
             if r['stl_robustness'] is not None:
                 status = "SATISFIED" if r['stl_robustness'] > 0 else "VIOLATED"
                 print(f"    STL (Qc={quality_constraint}, Ec={energy_constraint}): {status}")
+
+    # Generate comprehensive plots
+    logger.header("Generating publication-quality plots")
+    print(f"\n{'='*60}")
+    print("Generating publication-quality plots...")
+    print(f"{'='*60}")
+
+    plots_generated = generate_all_plots(
+        results=results,
+        pareto_indices=pareto_indices,
+        quality_constraint=quality_constraint,
+        experiment_name=experiment_name
+    )
+
+    logger.info("All plots generated successfully")
+    for plot_name, plot_path in plots_generated.items():
+        if plot_path:
+            logger.info(f"  {plot_name}: {plot_path}")
+
+    # Save results to JSON
+    logger.save_results()
+
+    # Print log file locations
+    log_files = logger.get_log_files()
+    print(f"\n{'='*60}")
+    print("Experiment completed!")
+    print(f"{'='*60}")
+    print(f"Logs saved to: {log_files['log_file']}")
+    print(f"Results saved to: {log_files['results_file']}")
+    print(f"Plots saved to: {plot_dirs['base']}")
+    print(f"{'='*60}\n")
 
     return results
 
