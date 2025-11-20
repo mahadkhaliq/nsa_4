@@ -169,7 +169,7 @@ if __name__ == '__main__':
     results = run_nas(
         search_algo='bayesian',  # Changed to Bayesian for better results
         num_trials=20,
-        epochs=40,
+        epochs=60,
         use_stl=True,
         quality_constraint=0.89,  # Paper: 2% below baseline (91% - 2% = 89%)
         energy_constraint=500.0,
