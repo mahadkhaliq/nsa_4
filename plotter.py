@@ -27,7 +27,7 @@ import numpy as np
 from datetime import datetime
 
 # Set publication-quality plot style
-plt.style.use('seaborn-v0_8-paper')
+plt.style.use('seaborn-paper')
 sns.set_palette("husl")
 plt.rcParams['figure.figsize'] = (10, 6)
 plt.rcParams['font.size'] = 12
