@@ -4,7 +4,6 @@ from evaluator import train_and_evaluate
 from data_loader import load_dataset
 from stl_monitor import check_pareto_optimal
 from bayesian_nas import bayesian_search
-from logger import NASLogger
 
 physical_devices = tf.config.list_physical_devices('GPU')
 try:
@@ -116,11 +115,15 @@ def run_nas(search_algo='random', num_trials=5, epochs=5, use_stl=False,
             print(f"Approx accuracy: {result['approx_accuracy']:.4f}")
             print(f"Accuracy drop: {result['exact_accuracy'] - result['approx_accuracy']:.4f}")
         if result['energy']:
-            print(f"Total energy: {result['energy']:.4f} mJ")
+            print(f"Total energy: {result['energy']:.4f} µJ")
         if result['energy_per_layer']:
-            print("Energy per layer:")
+            print("Energy breakdown per stage:")
             for layer_info in result['energy_per_layer']:
-                print(f"  Layer {layer_info['layer']}: {layer_info['multiplier']} - {layer_info['energy']:.4f} mJ (power: {layer_info['power']:.3f} mW)")
+                stage = layer_info.get('stage', layer_info.get('layer', '?'))
+                mult = layer_info['multiplier']
+                energy_uj = layer_info.get('energy_uJ', layer_info.get('energy', 0))
+                macs = layer_info.get('macs', 0)
+                print(f"  Stage {stage}: {mult} - {energy_uj:.4f} µJ ({macs:,} MACs)")
         if result['stl_robustness'] is not None:
             status = "SATISFIED" if result['stl_robustness'] > 0 else "VIOLATED"
             print(f"STL robustness: {result['stl_robustness']:.4f} ({status})")
@@ -133,7 +136,7 @@ def run_nas(search_algo='random', num_trials=5, epochs=5, use_stl=False,
 
     print(f"\n{'='*60}")
     print("Best architecture by accuracy:")
-    print(f"  Accuracy: {best['approx_accuracy']:.4f}, Energy: {best['energy']:.4f} mJ")
+    print(f"  Accuracy: {best['approx_accuracy']:.4f}, Energy: {best['energy']:.4f} µJ")
     print(f"  Architecture: {best['arch']}")
 
     if pareto_indices:
@@ -143,7 +146,7 @@ def run_nas(search_algo='random', num_trials=5, epochs=5, use_stl=False,
         for idx in pareto_indices:
             r = results[idx]
             print(f"\n  Trial {idx+1}:")
-            print(f"    Accuracy: {r['approx_accuracy']:.4f}, Energy: {r['energy']:.4f} mJ")
+            print(f"    Accuracy: {r['approx_accuracy']:.4f}, Energy: {r['energy']:.4f} µJ")
             if r['stl_robustness'] is not None:
                 status = "SATISFIED" if r['stl_robustness'] > 0 else "VIOLATED"
                 print(f"    STL (Qc={quality_constraint}, Ec={energy_constraint}): {status}")
@@ -166,11 +169,11 @@ if __name__ == '__main__':
     results = run_nas(
         search_algo='bayesian',  # Changed to Bayesian for better results
         num_trials=20,
-        epochs=80,  # Standard CIFAR-10 training (paper uses 80 epochs)
+        epochs=40,
         use_stl=True,
         quality_constraint=0.89,  # Paper: 2% below baseline (91% - 2% = 89%)
-        energy_constraint=100.0,  # Placeholder - paper uses Pareto analysis, not hard constraint
-        architecture='resnet'  # Using ResNet-18 from approxAI paper
+        energy_constraint=500.0,
+        architecture='resnet'  # Using ResNet-20 from approxAI paper
     )
 
     # Example: Switch to CNN (uncomment to use)
