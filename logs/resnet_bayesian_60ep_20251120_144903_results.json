@@ -1,0 +1,20 @@
+{
+  "config": {
+    "architecture": "ResNet-18",
+    "search_algorithm": "bayesian",
+    "num_trials": 20,
+    "epochs": 60,
+    "use_stl": true,
+    "quality_constraint": 0.89,
+    "energy_constraint": 500.0,
+    "search_space": "{'num_stages': [4], 'blocks_per_stage': [2], 'base_filters': [64], 'mul_map_files': ['./multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_2V0.bin']}",
+    "timestamp": "20251120_144903"
+  },
+  "timestamp": "20251120_144903",
+  "results": [
+    {
+      "trial": 1,
+      "timestamp": "2025-11-20 15:06:15",
+      "architecture": "{'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_2V0.bin', './multipliers/mul8u_2V0.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_2V0.bin']}",
+      "results": {
+        "exact_accuracy": 

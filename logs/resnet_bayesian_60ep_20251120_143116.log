@@ -1,0 +1,35 @@
+2025-11-20 14:31:16 - INFO - ============================================================
+2025-11-20 14:31:16 - INFO - EXPERIMENT CONFIGURATION
+2025-11-20 14:31:16 - INFO - ============================================================
+2025-11-20 14:31:16 - INFO -   architecture: ResNet-18
+2025-11-20 14:31:16 - INFO -   search_algorithm: bayesian
+2025-11-20 14:31:16 - INFO -   num_trials: 20
+2025-11-20 14:31:16 - INFO -   epochs: 60
+2025-11-20 14:31:16 - INFO -   use_stl: True
+2025-11-20 14:31:16 - INFO -   quality_constraint: 0.89
+2025-11-20 14:31:16 - INFO -   energy_constraint: 500.0
+2025-11-20 14:31:16 - INFO -   search_space: {'num_stages': [4], 'blocks_per_stage': [2], 'base_filters': [64], 'mul_map_files': ['./multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_2V0.bin']}
+2025-11-20 14:31:16 - INFO -   timestamp: 20251120_143116
+2025-11-20 14:31:16 - INFO - ----------------------------------------
+2025-11-20 14:31:16 - INFO - Trial 1/20
+2025-11-20 14:31:16 - INFO - ----------------------------------------
+2025-11-20 14:31:16 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_2V0.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin']}
+2025-11-20 14:48:29 - INFO - ----------------------------------------
+2025-11-20 14:48:29 - INFO - Trial 1/20
+2025-11-20 14:48:29 - INFO - ----------------------------------------
+2025-11-20 14:48:29 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_2V0.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin']}
+2025-11-20 14:48:29 - INFO - Exact accuracy: 0.9214
+2025-11-20 14:48:29 - INFO - Approx accuracy: 0.9187
+2025-11-20 14:48:29 - INFO - Accuracy drop: 0.0027
+2025-11-20 14:48:29 - INFO - Total energy: 1116.9055 µJ
+2025-11-20 14:48:29 - INFO - STL robustness: -616.9055 (VIOLATED)
+2025-11-20 14:48:29 - INFO - Energy breakdown per stage:
+2025-11-20 14:48:29 - INFO -   Stage 0: mul8u_2V0.bin - 64.1926 µJ (115,015,680 MACs)
+2025-11-20 14:48:29 - INFO -   Stage 1: mul8u_1JJQ.bin - 150.3876 µJ (264,241,152 MACs)
+2025-11-20 14:48:29 - INFO -   Stage 2: mul8u_1JJQ.bin - 300.7751 µJ (528,482,304 MACs)
+2025-11-20 14:48:29 - INFO -   Stage 3: mul8u_1JJQ.bin - 601.5503 µJ (1,056,964,608 MACs)
+2025-11-20 14:48:29 - INFO - Energy breakdown plot saved for trial 1
+2025-11-20 14:48:29 - INFO - ----------------------------------------
+2025-11-20 14:48:29 - INFO - Trial 2/20
+2025-11-20 14:48:29 - INFO - ----------------------------------------
+2025-11-20 14:48:29 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_2V0.bin']}
