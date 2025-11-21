@@ -15,8 +15,21 @@ import sys
 from datetime import datetime
 import json
 from io import StringIO
+import numpy as np
 import tensorflow as tf
 from tensorflow import keras
+
+
+class NumpyEncoder(json.JSONEncoder):
+    """Custom JSON encoder for NumPy types"""
+    def default(self, obj):
+        if isinstance(obj, (np.integer, np.int32, np.int64)):
+            return int(obj)
+        elif isinstance(obj, (np.floating, np.float32, np.float64)):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return super().default(obj)
 
 
 class NASLogger:
@@ -277,7 +290,7 @@ class NASLogger:
         }
 
         with open(self.results_json_file, 'w') as f:
-            json.dump(results_data, f, indent=2)
+            json.dump(results_data, f, indent=2, cls=NumpyEncoder)
 
         self.logger.info(f"\nResults saved to: {self.results_json_file}")
         self.logger.info(f"Log file: {self.main_log_file}")
