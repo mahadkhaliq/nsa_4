@@ -70,7 +70,9 @@ def train_and_evaluate(arch, x_train, y_train, x_test, y_test, epochs=10, use_st
         epochs=epochs,
         callbacks=callbacks,
         verbose=1,
-        steps_per_epoch=len(x_train_split) // 128
+        steps_per_epoch=len(x_train_split) // 128,
+        workers=4,              # Parallel data loading
+        use_multiprocessing=True  # Use multiple CPU cores for data augmentation
     )
 
     # Save weights

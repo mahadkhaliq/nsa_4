@@ -66,13 +66,14 @@ def setup_plot_dirs(experiment_name='nas', base_dir='plots'):
     return dirs
 
 
-def plot_training_curves(history, trial_num, save_dir=None):
+def plot_training_curves(history, trial_num, save_dir=None, arch_config=None):
     """Plot training accuracy and loss curves
 
     Args:
         history: Keras History object or dict with 'accuracy', 'val_accuracy', 'loss', 'val_loss'
         trial_num: Trial number for filename
         save_dir: Directory to save plot (if None, only displays)
+        arch_config: Architecture configuration string
 
     Returns:
         str: Path to saved plot (if saved)
@@ -82,6 +83,10 @@ def plot_training_curves(history, trial_num, save_dir=None):
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
 
+    # Add architecture config to suptitle if provided
+    if arch_config:
+        fig.suptitle(f'{arch_config} - Trial {trial_num}', fontweight='bold', fontsize=14)
+
     # Accuracy plot
     if 'accuracy' in history:
         epochs = range(1, len(history['accuracy']) + 1)
@@ -90,7 +95,8 @@ def plot_training_curves(history, trial_num, save_dir=None):
             ax1.plot(epochs, history['val_accuracy'], 'r--', label='Validation', linewidth=2)
         ax1.set_xlabel('Epoch')
         ax1.set_ylabel('Accuracy')
-        ax1.set_title(f'Trial {trial_num}: Accuracy')
+        title = 'Accuracy' if arch_config else f'Trial {trial_num}: Accuracy'
+        ax1.set_title(title)
         ax1.legend()
         ax1.grid(True, alpha=0.3)
 
@@ -102,7 +108,8 @@ def plot_training_curves(history, trial_num, save_dir=None):
             ax2.plot(epochs, history['val_loss'], 'r--', label='Validation', linewidth=2)
         ax2.set_xlabel('Epoch')
         ax2.set_ylabel('Loss')
-        ax2.set_title(f'Trial {trial_num}: Loss')
+        title = 'Loss' if arch_config else f'Trial {trial_num}: Loss'
+        ax2.set_title(title)
         ax2.legend()
         ax2.grid(True, alpha=0.3)
 
@@ -119,13 +126,14 @@ def plot_training_curves(history, trial_num, save_dir=None):
     return saved_path
 
 
-def plot_energy_vs_accuracy(results, pareto_indices=None, save_dir=None):
+def plot_energy_vs_accuracy(results, pareto_indices=None, save_dir=None, arch_config=None):
     """Plot energy-accuracy tradeoff scatter plot (like paper's Fig. 8-9)
 
     Args:
         results: List of result dicts with 'approx_accuracy', 'energy', 'energy_per_layer'
         pareto_indices: List of indices for Pareto-optimal solutions
         save_dir: Directory to save plot
+        arch_config: Architecture configuration string (e.g., "4 stages, 2 blocks, [64,128,256,512]")
 
     Returns:
         str: Path to saved plot (if saved)
@@ -165,7 +173,13 @@ def plot_energy_vs_accuracy(results, pareto_indices=None, save_dir=None):
 
     ax.set_xlabel('Energy (µJ)', fontweight='bold')
     ax.set_ylabel('Accuracy (%)', fontweight='bold')
-    ax.set_title('Energy-Accuracy Tradeoff', fontweight='bold', fontsize=18)
+
+    # Add architecture config to title if provided
+    title = 'Energy-Accuracy Tradeoff'
+    if arch_config:
+        title = f'{arch_config}\n{title}'
+    ax.set_title(title, fontweight='bold', fontsize=16)
+
     ax.legend(loc='best', framealpha=0.9)
     ax.grid(True, alpha=0.3, linestyle='--')
 
@@ -182,7 +196,7 @@ def plot_energy_vs_accuracy(results, pareto_indices=None, save_dir=None):
     return saved_path
 
 
-def plot_pareto_front(results, pareto_indices, quality_constraint=None, save_dir=None):
+def plot_pareto_front(results, pareto_indices, quality_constraint=None, save_dir=None, arch_config=None):
     """Plot Pareto front with STL constraint indicators
 
     Args:
@@ -190,6 +204,7 @@ def plot_pareto_front(results, pareto_indices, quality_constraint=None, save_dir
         pareto_indices: List of Pareto-optimal indices
         quality_constraint: Qc threshold (optional)
         save_dir: Directory to save plot
+        arch_config: Architecture configuration string
 
     Returns:
         str: Path to saved plot (if saved)
@@ -233,7 +248,13 @@ def plot_pareto_front(results, pareto_indices, quality_constraint=None, save_dir
 
     ax.set_xlabel('Energy (µJ)', fontweight='bold')
     ax.set_ylabel('Accuracy (%)', fontweight='bold')
-    ax.set_title('Pareto Front with STL Constraints', fontweight='bold', fontsize=18)
+
+    # Add architecture config to title if provided
+    title = 'Pareto Front with STL Constraints'
+    if arch_config:
+        title = f'{arch_config}\n{title}'
+    ax.set_title(title, fontweight='bold', fontsize=16)
+
     ax.legend(loc='best', framealpha=0.9)
     ax.grid(True, alpha=0.3, linestyle='--')
 
@@ -250,13 +271,14 @@ def plot_pareto_front(results, pareto_indices, quality_constraint=None, save_dir
     return saved_path
 
 
-def plot_energy_breakdown(result, trial_num=None, save_dir=None):
+def plot_energy_breakdown(result, trial_num=None, save_dir=None, arch_config=None):
     """Plot energy breakdown by stage and multiplier
 
     Args:
         result: Result dict with 'energy_per_layer'
         trial_num: Trial number (optional)
         save_dir: Directory to save plot
+        arch_config: Architecture configuration string
 
     Returns:
         str: Path to saved plot (if saved)
@@ -277,20 +299,22 @@ def plot_energy_breakdown(result, trial_num=None, save_dir=None):
 
     bars = ax.bar(stages, energies, color=colors, alpha=0.7, edgecolor='black', linewidth=1.5)
 
-    # Add value labels on bars
-    for bar, energy in zip(bars, energies):
+    # Add value labels on bars with multiplier names
+    for bar, energy, mult in zip(bars, energies, multipliers):
         height = bar.get_height()
         ax.text(bar.get_x() + bar.get_width()/2., height,
-                f'{energy:.1f}',
-                ha='center', va='bottom', fontsize=10)
+                f'{energy:.1f}\n({mult})',
+                ha='center', va='bottom', fontsize=9)
 
     ax.set_xlabel('Stage', fontweight='bold')
     ax.set_ylabel('Energy (µJ)', fontweight='bold')
 
     title = f'Energy Breakdown by Stage'
+    if arch_config:
+        title = f'{arch_config}\n{title}'
     if trial_num is not None:
         title += f' - Trial {trial_num}'
-    ax.set_title(title, fontweight='bold', fontsize=16)
+    ax.set_title(title, fontweight='bold', fontsize=14)
 
     # Custom legend
     from matplotlib.patches import Patch
@@ -365,7 +389,7 @@ def plot_stl_analysis(results, save_dir=None):
     return saved_path
 
 
-def generate_all_plots(results, pareto_indices=None, quality_constraint=None, experiment_name='nas'):
+def generate_all_plots(results, pareto_indices=None, quality_constraint=None, experiment_name='nas', arch_config=None):
     """Generate all plots for experiment
 
     Args:
@@ -373,12 +397,15 @@ def generate_all_plots(results, pareto_indices=None, quality_constraint=None, ex
         pareto_indices: List of Pareto-optimal indices
         quality_constraint: Qc threshold
         experiment_name: Name for experiment directories
+        arch_config: Architecture configuration string
 
     Returns:
         dict: Paths to all generated plots
     """
     print(f"\n{'='*60}")
     print(f"Generating plots for experiment: {experiment_name}")
+    if arch_config:
+        print(f"Configuration: {arch_config}")
     print(f"{'='*60}")
 
     # Setup directories
@@ -388,12 +415,12 @@ def generate_all_plots(results, pareto_indices=None, quality_constraint=None, ex
 
     # Energy-accuracy plots
     plots_generated['energy_vs_accuracy'] = plot_energy_vs_accuracy(
-        results, pareto_indices, save_dir=dirs['energy']
+        results, pareto_indices, save_dir=dirs['energy'], arch_config=arch_config
     )
 
     if pareto_indices:
         plots_generated['pareto_front'] = plot_pareto_front(
-            results, pareto_indices, quality_constraint, save_dir=dirs['energy']
+            results, pareto_indices, quality_constraint, save_dir=dirs['energy'], arch_config=arch_config
         )
 
     # STL analysis
@@ -402,7 +429,7 @@ def generate_all_plots(results, pareto_indices=None, quality_constraint=None, ex
     # Energy breakdown for best result
     best = max(results, key=lambda x: x.get('approx_accuracy', x.get('exact_accuracy', 0)))
     plots_generated['energy_breakdown'] = plot_energy_breakdown(
-        best, trial_num=None, save_dir=dirs['energy']
+        best, trial_num=None, save_dir=dirs['energy'], arch_config=arch_config
     )
 
     print(f"{'='*60}")

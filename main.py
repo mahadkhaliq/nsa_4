@@ -157,14 +157,20 @@ def run_nas(search_algo='random', num_trials=5, epochs=5, use_stl=False,
             status = "SATISFIED" if result['stl_robustness'] > 0 else "VIOLATED"
             print(f"STL robustness: {result['stl_robustness']:.4f} ({status})")
 
+        # Create architecture config string for plots
+        if use_resnet:
+            arch_config = f"ResNet: {arch['num_stages']} stages, {arch['blocks_per_stage']} blocks, {arch['filters_per_stage']}"
+        else:
+            arch_config = f"CNN: {arch['num_conv_layers']} layers, {arch['filters']} filters"
+
         # Plot training curves if history is available
         if 'history' in result and result['history']:
-            plot_training_curves(result['history'], trial_num=i+1, save_dir=plot_dirs['training'])
+            plot_training_curves(result['history'], trial_num=i+1, save_dir=plot_dirs['training'], arch_config=arch_config)
             logger.info(f"Training curves saved for trial {i+1}")
 
         # Plot energy breakdown for this trial
         if result['energy_per_layer']:
-            plot_energy_breakdown(result, trial_num=i+1, save_dir=plot_dirs['energy'])
+            plot_energy_breakdown(result, trial_num=i+1, save_dir=plot_dirs['energy'], arch_config=arch_config)
             logger.info(f"Energy breakdown plot saved for trial {i+1}")
 
     # Find best by accuracy
@@ -200,11 +206,21 @@ def run_nas(search_algo='random', num_trials=5, epochs=5, use_stl=False,
     print("Generating publication-quality plots...")
     print(f"{'='*60}")
 
+    # Create architecture config string for summary plots
+    if use_resnet:
+        # Get config from first result
+        first_arch = results[0]['arch']
+        arch_config = f"ResNet: {first_arch['num_stages']} stages, {first_arch['blocks_per_stage']} blocks, {first_arch['filters_per_stage']}"
+    else:
+        first_arch = results[0]['arch']
+        arch_config = f"CNN: {first_arch['num_conv_layers']} layers"
+
     plots_generated = generate_all_plots(
         results=results,
         pareto_indices=pareto_indices,
         quality_constraint=quality_constraint,
-        experiment_name=experiment_name
+        experiment_name=experiment_name,
+        arch_config=arch_config
     )
 
     logger.info("All plots generated successfully")
