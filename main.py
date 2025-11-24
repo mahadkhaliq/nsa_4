@@ -45,11 +45,11 @@ SEARCH_SPACE_RESNET = {
     #'blocks_per_stage': [2, 3, 4],
     #'base_filters': [16, 32],
     'mul_map_files': [
-        MUL_MAP_PATH + 'mul8u_1JJQ.bin',   # EXACT - 0% error (baseline)
-        #MUL_MAP_PATH + 'mul8u_2V0.bin',    # BEST - 0.0015% MAE, 64% energy saved
-        #MUL_MAP_PATH + 'mul8u_LK8.bin',    # EXCELLENT - 0.0046% MAE, 75% energy saved
+        #MUL_MAP_PATH + 'mul8u_1JJQ.bin',   # EXACT - 0% error (baseline)
+        MUL_MAP_PATH + 'mul8u_2V0.bin',    # BEST - 0.0015% MAE, 64% energy saved
+        MUL_MAP_PATH + 'mul8u_LK8.bin',    # EXCELLENT - 0.0046% MAE, 75% energy saved
         #MUL_MAP_PATH + 'mul8u_R92.bin',    # VERY GOOD - 0.017% MAE, 87.5% energy saved
-        MUL_MAP_PATH + 'mul8u_0AB.bin',    # GOOD - 0.057% MAE, 97.7% energy saved
+        #MUL_MAP_PATH + 'mul8u_0AB.bin',    # GOOD - 0.057% MAE, 97.7% energy saved
     ]
 }
 
