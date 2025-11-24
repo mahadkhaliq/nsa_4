@@ -1,0 +1,441 @@
+2025-11-23 20:18:22 - INFO - ============================================================
+2025-11-23 20:18:22 - INFO - EXPERIMENT CONFIGURATION
+2025-11-23 20:18:22 - INFO - ============================================================
+2025-11-23 20:18:22 - INFO -   architecture: ResNet-18
+2025-11-23 20:18:22 - INFO -   search_algorithm: bayesian
+2025-11-23 20:18:22 - INFO -   num_trials: 20
+2025-11-23 20:18:22 - INFO -   epochs: 60
+2025-11-23 20:18:22 - INFO -   use_stl: True
+2025-11-23 20:18:22 - INFO -   quality_constraint: 0.89
+2025-11-23 20:18:22 - INFO -   energy_constraint: 5000.0
+2025-11-23 20:18:22 - INFO -   search_space: {'num_stages': [4], 'blocks_per_stage': [2], 'base_filters': [64], 'mul_map_files': ['./multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_0AB.bin']}
+2025-11-23 20:18:22 - INFO -   timestamp: 20251123_201822
+2025-11-23 20:18:22 - INFO - ----------------------------------------
+2025-11-23 20:18:22 - INFO - Trial 1/20
+2025-11-23 20:18:22 - INFO - ----------------------------------------
+2025-11-23 20:18:22 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin']}
+2025-11-23 20:35:31 - INFO - ----------------------------------------
+2025-11-23 20:35:31 - INFO - Trial 1/20
+2025-11-23 20:35:31 - INFO - ----------------------------------------
+2025-11-23 20:35:31 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin']}
+2025-11-23 20:35:31 - INFO - Exact accuracy: 0.9221
+2025-11-23 20:35:31 - INFO - Approx accuracy: 0.9216
+2025-11-23 20:35:31 - INFO - Accuracy drop: 0.0005
+2025-11-23 20:35:31 - INFO - Total energy: 1118.1718 µJ
+2025-11-23 20:35:31 - INFO - STL robustness: 0.0316 (SATISFIED)
+2025-11-23 20:35:31 - INFO - Energy breakdown per stage:
+2025-11-23 20:35:31 - INFO -   Stage 0: mul8u_1JJQ.bin - 65.4589 µJ (115,015,680 MACs)
+2025-11-23 20:35:31 - INFO -   Stage 1: mul8u_1JJQ.bin - 150.3876 µJ (264,241,152 MACs)
+2025-11-23 20:35:31 - INFO -   Stage 2: mul8u_1JJQ.bin - 300.7751 µJ (528,482,304 MACs)
+2025-11-23 20:35:31 - INFO -   Stage 3: mul8u_1JJQ.bin - 601.5503 µJ (1,056,964,608 MACs)
+2025-11-23 20:35:31 - INFO - Training curves saved for trial 1
+2025-11-23 20:35:32 - INFO - Energy breakdown plot saved for trial 1
+2025-11-23 20:35:32 - INFO - ----------------------------------------
+2025-11-23 20:35:32 - INFO - Trial 2/20
+2025-11-23 20:35:32 - INFO - ----------------------------------------
+2025-11-23 20:35:32 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_0AB.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_0AB.bin', './multipliers/mul8u_1JJQ.bin']}
+2025-11-23 20:52:38 - INFO - ----------------------------------------
+2025-11-23 20:52:38 - INFO - Trial 2/20
+2025-11-23 20:52:38 - INFO - ----------------------------------------
+2025-11-23 20:52:38 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_0AB.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_0AB.bin', './multipliers/mul8u_1JJQ.bin']}
+2025-11-23 20:52:38 - INFO - Exact accuracy: 0.9237
+2025-11-23 20:52:38 - INFO - Approx accuracy: 0.1039
+2025-11-23 20:52:38 - INFO - Accuracy drop: 0.8198
+2025-11-23 20:52:38 - INFO - Total energy: 1038.2172 µJ
+2025-11-23 20:52:38 - INFO - STL robustness: -0.7861 (VIOLATED)
+2025-11-23 20:52:38 - INFO - Energy breakdown per stage:
+2025-11-23 20:52:38 - INFO -   Stage 0: mul8u_0AB.bin - 51.1682 µJ (115,015,680 MACs)
+2025-11-23 20:52:38 - INFO -   Stage 1: mul8u_1JJQ.bin - 150.3876 µJ (264,241,152 MACs)
+2025-11-23 20:52:38 - INFO -   Stage 2: mul8u_0AB.bin - 235.1112 µJ (528,482,304 MACs)
+2025-11-23 20:52:38 - INFO -   Stage 3: mul8u_1JJQ.bin - 601.5503 µJ (1,056,964,608 MACs)
+2025-11-23 20:52:38 - INFO - Training curves saved for trial 2
+2025-11-23 20:52:38 - INFO - Energy breakdown plot saved for trial 2
+2025-11-23 20:52:38 - INFO - ----------------------------------------
+2025-11-23 20:52:38 - INFO - Trial 3/20
+2025-11-23 20:52:38 - INFO - ----------------------------------------
+2025-11-23 20:52:38 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_0AB.bin']}
+2025-11-23 21:09:52 - INFO - ----------------------------------------
+2025-11-23 21:09:52 - INFO - Trial 3/20
+2025-11-23 21:09:52 - INFO - ----------------------------------------
+2025-11-23 21:09:52 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_0AB.bin']}
+2025-11-23 21:09:52 - INFO - Exact accuracy: 0.9252
+2025-11-23 21:09:52 - INFO - Approx accuracy: 0.1162
+2025-11-23 21:09:52 - INFO - Accuracy drop: 0.8090
+2025-11-23 21:09:52 - INFO - Total energy: 986.8440 µJ
+2025-11-23 21:09:52 - INFO - STL robustness: -0.7738 (VIOLATED)
+2025-11-23 21:09:52 - INFO - Energy breakdown per stage:
+2025-11-23 21:09:52 - INFO -   Stage 0: mul8u_1JJQ.bin - 65.4589 µJ (115,015,680 MACs)
+2025-11-23 21:09:52 - INFO -   Stage 1: mul8u_1JJQ.bin - 150.3876 µJ (264,241,152 MACs)
+2025-11-23 21:09:52 - INFO -   Stage 2: mul8u_1JJQ.bin - 300.7751 µJ (528,482,304 MACs)
+2025-11-23 21:09:52 - INFO -   Stage 3: mul8u_0AB.bin - 470.2224 µJ (1,056,964,608 MACs)
+2025-11-23 21:09:52 - INFO - Training curves saved for trial 3
+2025-11-23 21:09:53 - INFO - Energy breakdown plot saved for trial 3
+2025-11-23 21:09:53 - INFO - ----------------------------------------
+2025-11-23 21:09:53 - INFO - Trial 4/20
+2025-11-23 21:09:53 - INFO - ----------------------------------------
+2025-11-23 21:09:53 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin']}
+2025-11-23 21:27:07 - INFO - ----------------------------------------
+2025-11-23 21:27:07 - INFO - Trial 4/20
+2025-11-23 21:27:07 - INFO - ----------------------------------------
+2025-11-23 21:27:07 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin']}
+2025-11-23 21:27:07 - INFO - Exact accuracy: 0.9254
+2025-11-23 21:27:07 - INFO - Approx accuracy: 0.9251
+2025-11-23 21:27:07 - INFO - Accuracy drop: 0.0003
+2025-11-23 21:27:07 - INFO - Total energy: 1118.1718 µJ
+2025-11-23 21:27:07 - INFO - STL robustness: 0.0351 (SATISFIED)
+2025-11-23 21:27:07 - INFO - Energy breakdown per stage:
+2025-11-23 21:27:07 - INFO -   Stage 0: mul8u_1JJQ.bin - 65.4589 µJ (115,015,680 MACs)
+2025-11-23 21:27:07 - INFO -   Stage 1: mul8u_1JJQ.bin - 150.3876 µJ (264,241,152 MACs)
+2025-11-23 21:27:07 - INFO -   Stage 2: mul8u_1JJQ.bin - 300.7751 µJ (528,482,304 MACs)
+2025-11-23 21:27:07 - INFO -   Stage 3: mul8u_1JJQ.bin - 601.5503 µJ (1,056,964,608 MACs)
+2025-11-23 21:27:08 - INFO - Training curves saved for trial 4
+2025-11-23 21:27:08 - INFO - Energy breakdown plot saved for trial 4
+2025-11-23 21:27:08 - INFO - ----------------------------------------
+2025-11-23 21:27:08 - INFO - Trial 5/20
+2025-11-23 21:27:08 - INFO - ----------------------------------------
+2025-11-23 21:27:08 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin']}
+2025-11-23 21:44:20 - INFO - ----------------------------------------
+2025-11-23 21:44:20 - INFO - Trial 5/20
+2025-11-23 21:44:20 - INFO - ----------------------------------------
+2025-11-23 21:44:20 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin']}
+2025-11-23 21:44:20 - INFO - Exact accuracy: 0.9217
+2025-11-23 21:44:20 - INFO - Approx accuracy: 0.9220
+2025-11-23 21:44:20 - INFO - Accuracy drop: -0.0003
+2025-11-23 21:44:20 - INFO - Total energy: 1118.1718 µJ
+2025-11-23 21:44:20 - INFO - STL robustness: 0.0320 (SATISFIED)
+2025-11-23 21:44:20 - INFO - Energy breakdown per stage:
+2025-11-23 21:44:20 - INFO -   Stage 0: mul8u_1JJQ.bin - 65.4589 µJ (115,015,680 MACs)
+2025-11-23 21:44:20 - INFO -   Stage 1: mul8u_1JJQ.bin - 150.3876 µJ (264,241,152 MACs)
+2025-11-23 21:44:20 - INFO -   Stage 2: mul8u_1JJQ.bin - 300.7751 µJ (528,482,304 MACs)
+2025-11-23 21:44:20 - INFO -   Stage 3: mul8u_1JJQ.bin - 601.5503 µJ (1,056,964,608 MACs)
+2025-11-23 21:44:21 - INFO - Training curves saved for trial 5
+2025-11-23 21:44:21 - INFO - Energy breakdown plot saved for trial 5
+2025-11-23 21:44:21 - INFO - ----------------------------------------
+2025-11-23 21:44:21 - INFO - Trial 6/20
+2025-11-23 21:44:21 - INFO - ----------------------------------------
+2025-11-23 21:44:21 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_0AB.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_0AB.bin', './multipliers/mul8u_1JJQ.bin']}
+2025-11-23 22:01:36 - INFO - ----------------------------------------
+2025-11-23 22:01:36 - INFO - Trial 6/20
+2025-11-23 22:01:36 - INFO - ----------------------------------------
+2025-11-23 22:01:36 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_0AB.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_0AB.bin', './multipliers/mul8u_1JJQ.bin']}
+2025-11-23 22:01:36 - INFO - Exact accuracy: 0.9255
+2025-11-23 22:01:36 - INFO - Approx accuracy: 0.1098
+2025-11-23 22:01:36 - INFO - Accuracy drop: 0.8157
+2025-11-23 22:01:36 - INFO - Total energy: 1038.2172 µJ
+2025-11-23 22:01:36 - INFO - STL robustness: -0.7802 (VIOLATED)
+2025-11-23 22:01:36 - INFO - Energy breakdown per stage:
+2025-11-23 22:01:36 - INFO -   Stage 0: mul8u_0AB.bin - 51.1682 µJ (115,015,680 MACs)
+2025-11-23 22:01:36 - INFO -   Stage 1: mul8u_1JJQ.bin - 150.3876 µJ (264,241,152 MACs)
+2025-11-23 22:01:36 - INFO -   Stage 2: mul8u_0AB.bin - 235.1112 µJ (528,482,304 MACs)
+2025-11-23 22:01:36 - INFO -   Stage 3: mul8u_1JJQ.bin - 601.5503 µJ (1,056,964,608 MACs)
+2025-11-23 22:01:36 - INFO - Training curves saved for trial 6
+2025-11-23 22:01:36 - INFO - Energy breakdown plot saved for trial 6
+2025-11-23 22:01:36 - INFO - ----------------------------------------
+2025-11-23 22:01:36 - INFO - Trial 7/20
+2025-11-23 22:01:36 - INFO - ----------------------------------------
+2025-11-23 22:01:36 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin']}
+2025-11-23 22:18:55 - INFO - ----------------------------------------
+2025-11-23 22:18:55 - INFO - Trial 7/20
+2025-11-23 22:18:55 - INFO - ----------------------------------------
+2025-11-23 22:18:55 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin']}
+2025-11-23 22:18:55 - INFO - Exact accuracy: 0.9265
+2025-11-23 22:18:55 - INFO - Approx accuracy: 0.9267
+2025-11-23 22:18:55 - INFO - Accuracy drop: -0.0002
+2025-11-23 22:18:55 - INFO - Total energy: 1118.1718 µJ
+2025-11-23 22:18:55 - INFO - STL robustness: 0.0367 (SATISFIED)
+2025-11-23 22:18:55 - INFO - Energy breakdown per stage:
+2025-11-23 22:18:55 - INFO -   Stage 0: mul8u_1JJQ.bin - 65.4589 µJ (115,015,680 MACs)
+2025-11-23 22:18:55 - INFO -   Stage 1: mul8u_1JJQ.bin - 150.3876 µJ (264,241,152 MACs)
+2025-11-23 22:18:55 - INFO -   Stage 2: mul8u_1JJQ.bin - 300.7751 µJ (528,482,304 MACs)
+2025-11-23 22:18:55 - INFO -   Stage 3: mul8u_1JJQ.bin - 601.5503 µJ (1,056,964,608 MACs)
+2025-11-23 22:18:56 - INFO - Training curves saved for trial 7
+2025-11-23 22:18:56 - INFO - Energy breakdown plot saved for trial 7
+2025-11-23 22:18:56 - INFO - ----------------------------------------
+2025-11-23 22:18:56 - INFO - Trial 8/20
+2025-11-23 22:18:56 - INFO - ----------------------------------------
+2025-11-23 22:18:56 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_0AB.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin']}
+2025-11-23 22:36:16 - INFO - ----------------------------------------
+2025-11-23 22:36:16 - INFO - Trial 8/20
+2025-11-23 22:36:16 - INFO - ----------------------------------------
+2025-11-23 22:36:16 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_0AB.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin']}
+2025-11-23 22:36:16 - INFO - Exact accuracy: 0.9253
+2025-11-23 22:36:16 - INFO - Approx accuracy: 0.2179
+2025-11-23 22:36:16 - INFO - Accuracy drop: 0.7074
+2025-11-23 22:36:16 - INFO - Total energy: 1085.3399 µJ
+2025-11-23 22:36:16 - INFO - STL robustness: -0.6721 (VIOLATED)
+2025-11-23 22:36:16 - INFO - Energy breakdown per stage:
+2025-11-23 22:36:16 - INFO -   Stage 0: mul8u_1JJQ.bin - 65.4589 µJ (115,015,680 MACs)
+2025-11-23 22:36:16 - INFO -   Stage 1: mul8u_0AB.bin - 117.5556 µJ (264,241,152 MACs)
+2025-11-23 22:36:16 - INFO -   Stage 2: mul8u_1JJQ.bin - 300.7751 µJ (528,482,304 MACs)
+2025-11-23 22:36:16 - INFO -   Stage 3: mul8u_1JJQ.bin - 601.5503 µJ (1,056,964,608 MACs)
+2025-11-23 22:36:16 - INFO - Training curves saved for trial 8
+2025-11-23 22:36:17 - INFO - Energy breakdown plot saved for trial 8
+2025-11-23 22:36:17 - INFO - ----------------------------------------
+2025-11-23 22:36:17 - INFO - Trial 9/20
+2025-11-23 22:36:17 - INFO - ----------------------------------------
+2025-11-23 22:36:17 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_0AB.bin', './multipliers/mul8u_0AB.bin', './multipliers/mul8u_0AB.bin', './multipliers/mul8u_1JJQ.bin']}
+2025-11-23 22:53:35 - INFO - ----------------------------------------
+2025-11-23 22:53:35 - INFO - Trial 9/20
+2025-11-23 22:53:35 - INFO - ----------------------------------------
+2025-11-23 22:53:35 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_0AB.bin', './multipliers/mul8u_0AB.bin', './multipliers/mul8u_0AB.bin', './multipliers/mul8u_1JJQ.bin']}
+2025-11-23 22:53:35 - INFO - Exact accuracy: 0.9253
+2025-11-23 22:53:35 - INFO - Approx accuracy: 0.1000
+2025-11-23 22:53:35 - INFO - Accuracy drop: 0.8253
+2025-11-23 22:53:35 - INFO - Total energy: 1005.3853 µJ
+2025-11-23 22:53:35 - INFO - STL robustness: -0.7900 (VIOLATED)
+2025-11-23 22:53:35 - INFO - Energy breakdown per stage:
+2025-11-23 22:53:35 - INFO -   Stage 0: mul8u_0AB.bin - 51.1682 µJ (115,015,680 MACs)
+2025-11-23 22:53:35 - INFO -   Stage 1: mul8u_0AB.bin - 117.5556 µJ (264,241,152 MACs)
+2025-11-23 22:53:35 - INFO -   Stage 2: mul8u_0AB.bin - 235.1112 µJ (528,482,304 MACs)
+2025-11-23 22:53:35 - INFO -   Stage 3: mul8u_1JJQ.bin - 601.5503 µJ (1,056,964,608 MACs)
+2025-11-23 22:53:36 - INFO - Training curves saved for trial 9
+2025-11-23 22:53:36 - INFO - Energy breakdown plot saved for trial 9
+2025-11-23 22:53:36 - INFO - ----------------------------------------
+2025-11-23 22:53:36 - INFO - Trial 10/20
+2025-11-23 22:53:36 - INFO - ----------------------------------------
+2025-11-23 22:53:36 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_0AB.bin', './multipliers/mul8u_0AB.bin', './multipliers/mul8u_0AB.bin', './multipliers/mul8u_1JJQ.bin']}
+2025-11-23 23:10:54 - INFO - ----------------------------------------
+2025-11-23 23:10:54 - INFO - Trial 10/20
+2025-11-23 23:10:54 - INFO - ----------------------------------------
+2025-11-23 23:10:54 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_0AB.bin', './multipliers/mul8u_0AB.bin', './multipliers/mul8u_0AB.bin', './multipliers/mul8u_1JJQ.bin']}
+2025-11-23 23:10:54 - INFO - Exact accuracy: 0.9262
+2025-11-23 23:10:54 - INFO - Approx accuracy: 0.1006
+2025-11-23 23:10:54 - INFO - Accuracy drop: 0.8256
+2025-11-23 23:10:54 - INFO - Total energy: 1005.3853 µJ
+2025-11-23 23:10:54 - INFO - STL robustness: -0.7894 (VIOLATED)
+2025-11-23 23:10:54 - INFO - Energy breakdown per stage:
+2025-11-23 23:10:54 - INFO -   Stage 0: mul8u_0AB.bin - 51.1682 µJ (115,015,680 MACs)
+2025-11-23 23:10:54 - INFO -   Stage 1: mul8u_0AB.bin - 117.5556 µJ (264,241,152 MACs)
+2025-11-23 23:10:54 - INFO -   Stage 2: mul8u_0AB.bin - 235.1112 µJ (528,482,304 MACs)
+2025-11-23 23:10:54 - INFO -   Stage 3: mul8u_1JJQ.bin - 601.5503 µJ (1,056,964,608 MACs)
+2025-11-23 23:10:54 - INFO - Training curves saved for trial 10
+2025-11-23 23:10:55 - INFO - Energy breakdown plot saved for trial 10
+2025-11-23 23:10:55 - INFO - ----------------------------------------
+2025-11-23 23:10:55 - INFO - Trial 11/20
+2025-11-23 23:10:55 - INFO - ----------------------------------------
+2025-11-23 23:10:55 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_0AB.bin', './multipliers/mul8u_0AB.bin']}
+2025-11-23 23:28:12 - INFO - ----------------------------------------
+2025-11-23 23:28:12 - INFO - Trial 11/20
+2025-11-23 23:28:12 - INFO - ----------------------------------------
+2025-11-23 23:28:12 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_0AB.bin', './multipliers/mul8u_0AB.bin']}
+2025-11-23 23:28:12 - INFO - Exact accuracy: 0.9259
+2025-11-23 23:28:12 - INFO - Approx accuracy: 0.1000
+2025-11-23 23:28:12 - INFO - Accuracy drop: 0.8259
+2025-11-23 23:28:12 - INFO - Total energy: 921.1801 µJ
+2025-11-23 23:28:12 - INFO - STL robustness: -0.7900 (VIOLATED)
+2025-11-23 23:28:12 - INFO - Energy breakdown per stage:
+2025-11-23 23:28:12 - INFO -   Stage 0: mul8u_1JJQ.bin - 65.4589 µJ (115,015,680 MACs)
+2025-11-23 23:28:12 - INFO -   Stage 1: mul8u_1JJQ.bin - 150.3876 µJ (264,241,152 MACs)
+2025-11-23 23:28:12 - INFO -   Stage 2: mul8u_0AB.bin - 235.1112 µJ (528,482,304 MACs)
+2025-11-23 23:28:12 - INFO -   Stage 3: mul8u_0AB.bin - 470.2224 µJ (1,056,964,608 MACs)
+2025-11-23 23:28:12 - INFO - Training curves saved for trial 11
+2025-11-23 23:28:12 - INFO - Energy breakdown plot saved for trial 11
+2025-11-23 23:28:12 - INFO - ----------------------------------------
+2025-11-23 23:28:12 - INFO - Trial 12/20
+2025-11-23 23:28:12 - INFO - ----------------------------------------
+2025-11-23 23:28:12 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_0AB.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_0AB.bin', './multipliers/mul8u_1JJQ.bin']}
+2025-11-23 23:45:35 - INFO - ----------------------------------------
+2025-11-23 23:45:35 - INFO - Trial 12/20
+2025-11-23 23:45:35 - INFO - ----------------------------------------
+2025-11-23 23:45:35 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_0AB.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_0AB.bin', './multipliers/mul8u_1JJQ.bin']}
+2025-11-23 23:45:35 - INFO - Exact accuracy: 0.9248
+2025-11-23 23:45:35 - INFO - Approx accuracy: 0.1019
+2025-11-23 23:45:35 - INFO - Accuracy drop: 0.8229
+2025-11-23 23:45:35 - INFO - Total energy: 1038.2172 µJ
+2025-11-23 23:45:35 - INFO - STL robustness: -0.7881 (VIOLATED)
+2025-11-23 23:45:35 - INFO - Energy breakdown per stage:
+2025-11-23 23:45:35 - INFO -   Stage 0: mul8u_0AB.bin - 51.1682 µJ (115,015,680 MACs)
+2025-11-23 23:45:35 - INFO -   Stage 1: mul8u_1JJQ.bin - 150.3876 µJ (264,241,152 MACs)
+2025-11-23 23:45:35 - INFO -   Stage 2: mul8u_0AB.bin - 235.1112 µJ (528,482,304 MACs)
+2025-11-23 23:45:35 - INFO -   Stage 3: mul8u_1JJQ.bin - 601.5503 µJ (1,056,964,608 MACs)
+2025-11-23 23:45:36 - INFO - Training curves saved for trial 12
+2025-11-23 23:45:36 - INFO - Energy breakdown plot saved for trial 12
+2025-11-23 23:45:36 - INFO - ----------------------------------------
+2025-11-23 23:45:36 - INFO - Trial 13/20
+2025-11-23 23:45:36 - INFO - ----------------------------------------
+2025-11-23 23:45:36 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_0AB.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_0AB.bin']}
+2025-11-24 00:02:54 - INFO - ----------------------------------------
+2025-11-24 00:02:54 - INFO - Trial 13/20
+2025-11-24 00:02:54 - INFO - ----------------------------------------
+2025-11-24 00:02:54 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_0AB.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_0AB.bin']}
+2025-11-24 00:02:54 - INFO - Exact accuracy: 0.9251
+2025-11-24 00:02:54 - INFO - Approx accuracy: 0.1156
+2025-11-24 00:02:54 - INFO - Accuracy drop: 0.8095
+2025-11-24 00:02:54 - INFO - Total energy: 954.0120 µJ
+2025-11-24 00:02:54 - INFO - STL robustness: -0.7744 (VIOLATED)
+2025-11-24 00:02:54 - INFO - Energy breakdown per stage:
+2025-11-24 00:02:54 - INFO -   Stage 0: mul8u_1JJQ.bin - 65.4589 µJ (115,015,680 MACs)
+2025-11-24 00:02:54 - INFO -   Stage 1: mul8u_0AB.bin - 117.5556 µJ (264,241,152 MACs)
+2025-11-24 00:02:54 - INFO -   Stage 2: mul8u_1JJQ.bin - 300.7751 µJ (528,482,304 MACs)
+2025-11-24 00:02:54 - INFO -   Stage 3: mul8u_0AB.bin - 470.2224 µJ (1,056,964,608 MACs)
+2025-11-24 00:02:55 - INFO - Training curves saved for trial 13
+2025-11-24 00:02:55 - INFO - Energy breakdown plot saved for trial 13
+2025-11-24 00:02:55 - INFO - ----------------------------------------
+2025-11-24 00:02:55 - INFO - Trial 14/20
+2025-11-24 00:02:55 - INFO - ----------------------------------------
+2025-11-24 00:02:55 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_0AB.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_0AB.bin']}
+2025-11-24 00:20:15 - INFO - ----------------------------------------
+2025-11-24 00:20:15 - INFO - Trial 14/20
+2025-11-24 00:20:15 - INFO - ----------------------------------------
+2025-11-24 00:20:15 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_0AB.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_0AB.bin']}
+2025-11-24 00:20:15 - INFO - Exact accuracy: 0.9253
+2025-11-24 00:20:15 - INFO - Approx accuracy: 0.1006
+2025-11-24 00:20:15 - INFO - Accuracy drop: 0.8247
+2025-11-24 00:20:15 - INFO - Total energy: 972.5533 µJ
+2025-11-24 00:20:15 - INFO - STL robustness: -0.7894 (VIOLATED)
+2025-11-24 00:20:15 - INFO - Energy breakdown per stage:
+2025-11-24 00:20:15 - INFO -   Stage 0: mul8u_0AB.bin - 51.1682 µJ (115,015,680 MACs)
+2025-11-24 00:20:15 - INFO -   Stage 1: mul8u_1JJQ.bin - 150.3876 µJ (264,241,152 MACs)
+2025-11-24 00:20:15 - INFO -   Stage 2: mul8u_1JJQ.bin - 300.7751 µJ (528,482,304 MACs)
+2025-11-24 00:20:15 - INFO -   Stage 3: mul8u_0AB.bin - 470.2224 µJ (1,056,964,608 MACs)
+2025-11-24 00:20:15 - INFO - Training curves saved for trial 14
+2025-11-24 00:20:16 - INFO - Energy breakdown plot saved for trial 14
+2025-11-24 00:20:16 - INFO - ----------------------------------------
+2025-11-24 00:20:16 - INFO - Trial 15/20
+2025-11-24 00:20:16 - INFO - ----------------------------------------
+2025-11-24 00:20:16 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_0AB.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_0AB.bin']}
+2025-11-24 00:37:37 - INFO - ----------------------------------------
+2025-11-24 00:37:37 - INFO - Trial 15/20
+2025-11-24 00:37:37 - INFO - ----------------------------------------
+2025-11-24 00:37:37 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_0AB.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_0AB.bin']}
+2025-11-24 00:37:37 - INFO - Exact accuracy: 0.9250
+2025-11-24 00:37:37 - INFO - Approx accuracy: 0.1000
+2025-11-24 00:37:37 - INFO - Accuracy drop: 0.8250
+2025-11-24 00:37:37 - INFO - Total energy: 954.0120 µJ
+2025-11-24 00:37:37 - INFO - STL robustness: -0.7900 (VIOLATED)
+2025-11-24 00:37:37 - INFO - Energy breakdown per stage:
+2025-11-24 00:37:37 - INFO -   Stage 0: mul8u_1JJQ.bin - 65.4589 µJ (115,015,680 MACs)
+2025-11-24 00:37:37 - INFO -   Stage 1: mul8u_0AB.bin - 117.5556 µJ (264,241,152 MACs)
+2025-11-24 00:37:37 - INFO -   Stage 2: mul8u_1JJQ.bin - 300.7751 µJ (528,482,304 MACs)
+2025-11-24 00:37:37 - INFO -   Stage 3: mul8u_0AB.bin - 470.2224 µJ (1,056,964,608 MACs)
+2025-11-24 00:37:37 - INFO - Training curves saved for trial 15
+2025-11-24 00:37:38 - INFO - Energy breakdown plot saved for trial 15
+2025-11-24 00:37:38 - INFO - ----------------------------------------
+2025-11-24 00:37:38 - INFO - Trial 16/20
+2025-11-24 00:37:38 - INFO - ----------------------------------------
+2025-11-24 00:37:38 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_0AB.bin', './multipliers/mul8u_0AB.bin', './multipliers/mul8u_0AB.bin']}
+2025-11-24 00:54:59 - INFO - ----------------------------------------
+2025-11-24 00:54:59 - INFO - Trial 16/20
+2025-11-24 00:54:59 - INFO - ----------------------------------------
+2025-11-24 00:54:59 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_0AB.bin', './multipliers/mul8u_0AB.bin', './multipliers/mul8u_0AB.bin']}
+2025-11-24 00:54:59 - INFO - Exact accuracy: 0.9309
+2025-11-24 00:54:59 - INFO - Approx accuracy: 0.1000
+2025-11-24 00:54:59 - INFO - Accuracy drop: 0.8309
+2025-11-24 00:54:59 - INFO - Total energy: 888.3481 µJ
+2025-11-24 00:54:59 - INFO - STL robustness: -0.7900 (VIOLATED)
+2025-11-24 00:54:59 - INFO - Energy breakdown per stage:
+2025-11-24 00:54:59 - INFO -   Stage 0: mul8u_1JJQ.bin - 65.4589 µJ (115,015,680 MACs)
+2025-11-24 00:54:59 - INFO -   Stage 1: mul8u_0AB.bin - 117.5556 µJ (264,241,152 MACs)
+2025-11-24 00:54:59 - INFO -   Stage 2: mul8u_0AB.bin - 235.1112 µJ (528,482,304 MACs)
+2025-11-24 00:54:59 - INFO -   Stage 3: mul8u_0AB.bin - 470.2224 µJ (1,056,964,608 MACs)
+2025-11-24 00:54:59 - INFO - Training curves saved for trial 16
+2025-11-24 00:55:00 - INFO - Energy breakdown plot saved for trial 16
+2025-11-24 00:55:00 - INFO - ----------------------------------------
+2025-11-24 00:55:00 - INFO - Trial 17/20
+2025-11-24 00:55:00 - INFO - ----------------------------------------
+2025-11-24 00:55:00 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_0AB.bin', './multipliers/mul8u_0AB.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_0AB.bin']}
+2025-11-24 01:12:17 - INFO - ----------------------------------------
+2025-11-24 01:12:17 - INFO - Trial 17/20
+2025-11-24 01:12:17 - INFO - ----------------------------------------
+2025-11-24 01:12:17 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_0AB.bin', './multipliers/mul8u_0AB.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_0AB.bin']}
+2025-11-24 01:12:17 - INFO - Exact accuracy: 0.9294
+2025-11-24 01:12:17 - INFO - Approx accuracy: 0.1000
+2025-11-24 01:12:17 - INFO - Accuracy drop: 0.8294
+2025-11-24 01:12:17 - INFO - Total energy: 939.7213 µJ
+2025-11-24 01:12:17 - INFO - STL robustness: -0.7900 (VIOLATED)
+2025-11-24 01:12:17 - INFO - Energy breakdown per stage:
+2025-11-24 01:12:17 - INFO -   Stage 0: mul8u_0AB.bin - 51.1682 µJ (115,015,680 MACs)
+2025-11-24 01:12:17 - INFO -   Stage 1: mul8u_0AB.bin - 117.5556 µJ (264,241,152 MACs)
+2025-11-24 01:12:17 - INFO -   Stage 2: mul8u_1JJQ.bin - 300.7751 µJ (528,482,304 MACs)
+2025-11-24 01:12:17 - INFO -   Stage 3: mul8u_0AB.bin - 470.2224 µJ (1,056,964,608 MACs)
+2025-11-24 01:12:18 - INFO - Training curves saved for trial 17
+2025-11-24 01:12:18 - INFO - Energy breakdown plot saved for trial 17
+2025-11-24 01:12:18 - INFO - ----------------------------------------
+2025-11-24 01:12:18 - INFO - Trial 18/20
+2025-11-24 01:12:18 - INFO - ----------------------------------------
+2025-11-24 01:12:18 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_0AB.bin', './multipliers/mul8u_0AB.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin']}
+2025-11-24 01:29:40 - INFO - ----------------------------------------
+2025-11-24 01:29:40 - INFO - Trial 18/20
+2025-11-24 01:29:40 - INFO - ----------------------------------------
+2025-11-24 01:29:40 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_0AB.bin', './multipliers/mul8u_0AB.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin']}
+2025-11-24 01:29:40 - INFO - Exact accuracy: 0.9260
+2025-11-24 01:29:40 - INFO - Approx accuracy: 0.1090
+2025-11-24 01:29:40 - INFO - Accuracy drop: 0.8170
+2025-11-24 01:29:40 - INFO - Total energy: 1071.0492 µJ
+2025-11-24 01:29:40 - INFO - STL robustness: -0.7810 (VIOLATED)
+2025-11-24 01:29:40 - INFO - Energy breakdown per stage:
+2025-11-24 01:29:40 - INFO -   Stage 0: mul8u_0AB.bin - 51.1682 µJ (115,015,680 MACs)
+2025-11-24 01:29:40 - INFO -   Stage 1: mul8u_0AB.bin - 117.5556 µJ (264,241,152 MACs)
+2025-11-24 01:29:40 - INFO -   Stage 2: mul8u_1JJQ.bin - 300.7751 µJ (528,482,304 MACs)
+2025-11-24 01:29:40 - INFO -   Stage 3: mul8u_1JJQ.bin - 601.5503 µJ (1,056,964,608 MACs)
+2025-11-24 01:29:40 - INFO - Training curves saved for trial 18
+2025-11-24 01:29:40 - INFO - Energy breakdown plot saved for trial 18
+2025-11-24 01:29:40 - INFO - ----------------------------------------
+2025-11-24 01:29:40 - INFO - Trial 19/20
+2025-11-24 01:29:40 - INFO - ----------------------------------------
+2025-11-24 01:29:40 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_0AB.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin']}
+2025-11-24 01:47:01 - INFO - ----------------------------------------
+2025-11-24 01:47:01 - INFO - Trial 19/20
+2025-11-24 01:47:01 - INFO - ----------------------------------------
+2025-11-24 01:47:01 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_0AB.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin']}
+2025-11-24 01:47:01 - INFO - Exact accuracy: 0.9261
+2025-11-24 01:47:01 - INFO - Approx accuracy: 0.2322
+2025-11-24 01:47:01 - INFO - Accuracy drop: 0.6939
+2025-11-24 01:47:01 - INFO - Total energy: 1103.8811 µJ
+2025-11-24 01:47:01 - INFO - STL robustness: -0.6578 (VIOLATED)
+2025-11-24 01:47:01 - INFO - Energy breakdown per stage:
+2025-11-24 01:47:01 - INFO -   Stage 0: mul8u_0AB.bin - 51.1682 µJ (115,015,680 MACs)
+2025-11-24 01:47:01 - INFO -   Stage 1: mul8u_1JJQ.bin - 150.3876 µJ (264,241,152 MACs)
+2025-11-24 01:47:01 - INFO -   Stage 2: mul8u_1JJQ.bin - 300.7751 µJ (528,482,304 MACs)
+2025-11-24 01:47:01 - INFO -   Stage 3: mul8u_1JJQ.bin - 601.5503 µJ (1,056,964,608 MACs)
+2025-11-24 01:47:01 - INFO - Training curves saved for trial 19
+2025-11-24 01:47:02 - INFO - Energy breakdown plot saved for trial 19
+2025-11-24 01:47:02 - INFO - ----------------------------------------
+2025-11-24 01:47:02 - INFO - Trial 20/20
+2025-11-24 01:47:02 - INFO - ----------------------------------------
+2025-11-24 01:47:02 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_0AB.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin']}
+2025-11-24 02:04:20 - INFO - ----------------------------------------
+2025-11-24 02:04:20 - INFO - Trial 20/20
+2025-11-24 02:04:20 - INFO - ----------------------------------------
+2025-11-24 02:04:20 - INFO - Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_0AB.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin']}
+2025-11-24 02:04:20 - INFO - Exact accuracy: 0.9286
+2025-11-24 02:04:20 - INFO - Approx accuracy: 0.2062
+2025-11-24 02:04:20 - INFO - Accuracy drop: 0.7224
+2025-11-24 02:04:20 - INFO - Total energy: 1103.8811 µJ
+2025-11-24 02:04:20 - INFO - STL robustness: -0.6838 (VIOLATED)
+2025-11-24 02:04:20 - INFO - Energy breakdown per stage:
+2025-11-24 02:04:20 - INFO -   Stage 0: mul8u_0AB.bin - 51.1682 µJ (115,015,680 MACs)
+2025-11-24 02:04:20 - INFO -   Stage 1: mul8u_1JJQ.bin - 150.3876 µJ (264,241,152 MACs)
+2025-11-24 02:04:20 - INFO -   Stage 2: mul8u_1JJQ.bin - 300.7751 µJ (528,482,304 MACs)
+2025-11-24 02:04:20 - INFO -   Stage 3: mul8u_1JJQ.bin - 601.5503 µJ (1,056,964,608 MACs)
+2025-11-24 02:04:21 - INFO - Training curves saved for trial 20
+2025-11-24 02:04:21 - INFO - Energy breakdown plot saved for trial 20
+2025-11-24 02:04:21 - INFO - ============================================================
+2025-11-24 02:04:21 - INFO - EXPERIMENT SUMMARY
+2025-11-24 02:04:21 - INFO - ============================================================
+2025-11-24 02:04:21 - INFO - Best architecture by accuracy:
+2025-11-24 02:04:21 - INFO -   Accuracy: 0.9267
+2025-11-24 02:04:21 - INFO -   Energy: 1118.1718 µJ
+2025-11-24 02:04:21 - INFO -   Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_1JJQ.bin']}
+2025-11-24 02:04:21 - INFO - 
+Best architecture by energy:
+2025-11-24 02:04:21 - INFO -   Accuracy: 0.1000
+2025-11-24 02:04:21 - INFO -   Energy: 888.3481 µJ
+2025-11-24 02:04:21 - INFO -   Architecture: {'num_stages': 4, 'blocks_per_stage': 2, 'filters_per_stage': [64, 128, 256, 512], 'mul_map_files': ['./multipliers/mul8u_1JJQ.bin', './multipliers/mul8u_0AB.bin', './multipliers/mul8u_0AB.bin', './multipliers/mul8u_0AB.bin']}
+2025-11-24 02:04:21 - INFO - 
+STL Constraint Statistics:
+2025-11-24 02:04:21 - INFO -   Satisfied: 4/20 (20.0%)
+2025-11-24 02:04:21 - INFO -   Violated: 16/20 (80.0%)
+2025-11-24 02:04:21 - INFO - 
+Pareto-optimal architectures: 12 found
+2025-11-24 02:04:21 - INFO - ============================================================
+2025-11-24 02:04:21 - INFO - Generating publication-quality plots
+2025-11-24 02:04:21 - INFO - ============================================================
+2025-11-24 02:04:23 - INFO - All plots generated successfully
+2025-11-24 02:04:23 - INFO -   energy_vs_accuracy: plots/resnet_bayesian_60ep_20251124_020421/energy/energy_vs_accuracy.png
+2025-11-24 02:04:23 - INFO -   pareto_front: plots/resnet_bayesian_60ep_20251124_020421/energy/pareto_front.png
+2025-11-24 02:04:23 - INFO -   stl_analysis: plots/resnet_bayesian_60ep_20251124_020421/stl/stl_analysis.png
+2025-11-24 02:04:23 - INFO -   energy_breakdown: plots/resnet_bayesian_60ep_20251124_020421/energy/energy_breakdown.png
+2025-11-24 02:04:23 - INFO - 
+Results saved to: logs/resnet_bayesian_60ep_20251123_201822_results.json
+2025-11-24 02:04:23 - INFO - Log file: logs/resnet_bayesian_60ep_20251123_201822.log
