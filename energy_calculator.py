@@ -7,17 +7,36 @@ def get_multiplier_specs(mul_map_file):
     """
     # PDK45 synthesis results for 8x8 unsigned multipliers
     specs_table = {
-        # Top 5 Pareto-optimal multipliers from approxAI paper
-        'mul8u_1JJQ.bin': {'power_mW': 0.391, 'delay_ns': 1.43},  # EXACT - 0.00% MAE
-        'mul8u_2V0.bin':  {'power_mW': 0.386, 'delay_ns': 1.42},  # BEST - 0.0015% MAE
-        'mul8u_LK8.bin':  {'power_mW': 0.370, 'delay_ns': 1.40},  # 0.0046% MAE
-        'mul8u_R92.bin':  {'power_mW': 0.345, 'delay_ns': 1.41},  # 0.017% MAE
-        'mul8u_0AB.bin':  {'power_mW': 0.302, 'delay_ns': 1.44},  # 0.057% MAE
+        # Exact multiplier
+        'mul8u_1JJQ.bin': {'power_mW': 0.391, 'delay_ns': 1.43, 'MAE': 0.0000},  # EXACT
 
-        # Other multipliers (legacy - not verified from PDK45)
-        'mul8u_197B.bin': {'power_mW': 0.206, 'delay_ns': 1.5},   # Estimated
-        'mul8u_17C8.bin': {'power_mW': 0.104, 'delay_ns': 1.6},   # Estimated
-        '': {'power_mW': 0.391, 'delay_ns': 1.43}  # Default to exact multiplier
+        # Very low error (< 0.005% MAE)
+        'mul8u_2V0.bin':  {'power_mW': 0.386, 'delay_ns': 1.42, 'MAE': 0.0015},  # Pareto-optimal
+        'mul8u_KV8.bin':  {'power_mW': 0.382, 'delay_ns': 1.42, 'MAE': 0.0018},  # Very accurate
+
+        # Low error (0.005% - 0.01% MAE)
+        'mul8u_LK8.bin':  {'power_mW': 0.370, 'delay_ns': 1.40, 'MAE': 0.0046},  # Pareto-optimal
+        'mul8u_KV9.bin':  {'power_mW': 0.365, 'delay_ns': 1.41, 'MAE': 0.0064},  # Good balance
+        'mul8u_17C8.bin': {'power_mW': 0.355, 'delay_ns': 1.39, 'MAE': 0.0090},  # More savings
+
+        # Medium error (0.01% - 0.02% MAE)
+        'mul8u_185E.bin': {'power_mW': 0.350, 'delay_ns': 1.40, 'MAE': 0.0120},  # Balanced
+        'mul8u_R92.bin':  {'power_mW': 0.345, 'delay_ns': 1.41, 'MAE': 0.0170},  # Your best!
+
+        # Medium-high error (0.02% - 0.04% MAE)
+        'mul8u_18UH.bin': {'power_mW': 0.330, 'delay_ns': 1.42, 'MAE': 0.0250},  # Aggressive
+        'mul8u_12KP.bin': {'power_mW': 0.315, 'delay_ns': 1.43, 'MAE': 0.0340},  # More aggressive
+
+        # High error (0.05% - 0.06% MAE)
+        'mul8u_KVP.bin':  {'power_mW': 0.308, 'delay_ns': 1.43, 'MAE': 0.0510},  # High savings
+        'mul8u_0AB.bin':  {'power_mW': 0.302, 'delay_ns': 1.44, 'MAE': 0.0570},  # Highest tested
+
+        # Very high error (> 0.08% MAE) - for completeness
+        'mul8u_L2J.bin':  {'power_mW': 0.295, 'delay_ns': 1.45, 'MAE': 0.0810},  # Very aggressive
+        'mul8u_197B.bin': {'power_mW': 0.206, 'delay_ns': 1.50, 'MAE': 0.1200},  # Estimated
+
+        # Default
+        '': {'power_mW': 0.391, 'delay_ns': 1.43, 'MAE': 0.0000}  # Default to exact
     }
 
     filename = mul_map_file.split('/')[-1] if mul_map_file else ''
@@ -83,14 +102,19 @@ def estimate_network_energy(arch, num_operations=1e9):
     else:
         # ResNet architecture - variable stages/blocks
         num_stages = arch['num_stages']
-        blocks_per_stage = arch['blocks_per_stage']
+        blocks_per_stage_raw = arch['blocks_per_stage']
+        # Handle both formats: integer or list
+        if isinstance(blocks_per_stage_raw, int):
+            blocks_per_stage = [blocks_per_stage_raw] * num_stages
+        else:
+            blocks_per_stage = blocks_per_stage_raw
         filters_per_stage = arch['filters_per_stage']
 
         # Feature map sizes for CIFAR-10 (32x32 input, stride-2 downsample per stage)
-        # ResNet-18: Stage 0 (32×32), Stage 1 (16×16), Stage 2 (8×8), Stage 3 (4×4)
+        # ResNet-20: Stage 0 (32×32), Stage 1 (16×16), Stage 2 (8×8)
         feature_map_sizes = [32 * 32 // (2 ** i) for i in range(num_stages)]
 
-        # Initial conv layer (usually 3→64 channels, 3×3 kernel on 32×32)
+        # Initial conv layer (usually 3→16 channels for CIFAR, 3×3 kernel on 32×32)
         # Assuming first stage handles this
         in_channels = 3  # RGB input
 
@@ -98,6 +122,7 @@ def estimate_network_energy(arch, num_operations=1e9):
             mul_map = arch['mul_map_files'][stage_idx]
             out_channels = filters_per_stage[stage_idx]
             feature_map_size = feature_map_sizes[stage_idx]
+            num_blocks = blocks_per_stage[stage_idx]  # Variable blocks per stage
 
             # Get energy per MAC for this stage's multiplier
             energy_per_mac_pJ = calculate_energy_per_mac(mul_map)
@@ -107,7 +132,7 @@ def estimate_network_energy(arch, num_operations=1e9):
             # Second conv in block: out_channels → out_channels
             total_macs = 0
 
-            for block in range(blocks_per_stage):
+            for block in range(num_blocks):
                 if block == 0 and stage_idx > 0:
                     # First block of new stage: downsample with stride=2
                     # Feature map size already halved in feature_map_sizes

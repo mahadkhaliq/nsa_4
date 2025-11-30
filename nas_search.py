@@ -95,21 +95,33 @@ def sample_resnet_multipliers(search_space):
     """Sample ResNet architecture with heterogeneous multipliers
 
     NAS searches for:
-    - Number of stages (2 or 3)
-    - Blocks per stage (2, 3, or 4)
-    - Base filters (16 or 32, doubles each stage)
+    - Architecture configuration (blocks per stage)
     - Multiplier per stage (heterogeneous approximation)
 
     Args:
         search_space: Dict with 'num_stages', 'blocks_per_stage',
                      'base_filters', 'mul_map_files'
 
+        blocks_per_stage can be:
+        - Single integer: [2] -> all stages have 2 blocks (OLD FORMAT)
+        - List of integers: [[3,3,3], [5,5,5], ...] -> pick one config (NEW FORMAT)
+
     Returns:
         Architecture dict defining the ResNet configuration
     """
     # Sample architecture parameters
     num_stages = random.choice(search_space['num_stages'])
-    blocks_per_stage = random.choice(search_space['blocks_per_stage'])
+
+    # Handle both old and new formats for blocks_per_stage
+    blocks_options = search_space['blocks_per_stage']
+    if isinstance(blocks_options[0], list):
+        # NEW FORMAT: List of block configurations [[3,3,3], [5,5,5], ...]
+        blocks_per_stage = random.choice(blocks_options)
+    else:
+        # OLD FORMAT: Single value [2] -> create uniform list
+        blocks_value = random.choice(blocks_options)
+        blocks_per_stage = [blocks_value] * num_stages
+
     base_filters = random.choice(search_space['base_filters'])
 
     # Sample multipliers (one per stage - heterogeneous)
@@ -121,7 +133,7 @@ def sample_resnet_multipliers(search_space):
 
     return {
         'num_stages': num_stages,
-        'blocks_per_stage': blocks_per_stage,
+        'blocks_per_stage': blocks_per_stage,  # Now a list for variable blocks
         'filters_per_stage': filters_per_stage,
         'mul_map_files': mul_maps  # One per stage
     }

@@ -131,16 +131,24 @@ def build_resnet20_exact(arch=None, input_shape=(32, 32, 3), num_classes=10):
 
     Args:
         arch: Architecture dict with 'num_stages', 'blocks_per_stage', 'filters_per_stage'
+              blocks_per_stage can be:
+              - Single integer: 3 blocks per stage (OLD)
+              - List of integers: [3, 3, 3] variable blocks per stage (NEW)
               If None, uses default ResNet-20: 3 stages, 3 blocks, [16,32,64] filters
     """
     # Default to ResNet-20 if no arch specified
     if arch is None:
         num_stages = 3
-        blocks_per_stage = 3
+        blocks_per_stage = [3, 3, 3]
         filters_per_stage = [16, 32, 64]
     else:
         num_stages = arch['num_stages']
-        blocks_per_stage = arch['blocks_per_stage']
+        blocks_per_stage_raw = arch['blocks_per_stage']
+        # Handle both formats: integer or list
+        if isinstance(blocks_per_stage_raw, int):
+            blocks_per_stage = [blocks_per_stage_raw] * num_stages
+        else:
+            blocks_per_stage = blocks_per_stage_raw
         filters_per_stage = arch['filters_per_stage']
 
     inputs = Input(shape=input_shape, name='input')
@@ -150,24 +158,27 @@ def build_resnet20_exact(arch=None, input_shape=(32, 32, 3), num_classes=10):
     x = BatchNormalization(name='init_bn')(x)
     x = Activation('relu', name='init_relu')(x)
 
-    # Build stages dynamically
+    # Build stages dynamically with variable blocks per stage
+    total_conv_layers = 0
     for stage_idx in range(num_stages):
         filters = filters_per_stage[stage_idx]
+        num_blocks = blocks_per_stage[stage_idx]  # Variable blocks per stage
         stride = 2 if stage_idx > 0 else 1  # Downsample after first stage
 
-        for block_idx in range(blocks_per_stage):
+        for block_idx in range(num_blocks):
             # First block of stage downsamples, rest maintain size
             block_stride = stride if block_idx == 0 else 1
             x = residual_block_exact(
                 x, filters, stride=block_stride,
                 name=f'stage{stage_idx+1}_block{block_idx+1}'
             )
+            total_conv_layers += 2  # Each block has 2 conv layers
 
     # Output
     x = GlobalAveragePooling2D(name='global_pool')(x)
     outputs = Dense(num_classes, activation='softmax', name='output')(x)
 
-    total_layers = 1 + num_stages * blocks_per_stage * 2 + 1
+    total_layers = 1 + total_conv_layers + 1
     model = Model(inputs, outputs, name=f'ResNet{total_layers}_CIFAR10_Exact')
     return model
 
@@ -180,9 +191,17 @@ def build_resnet20_approx(arch, input_shape=(32, 32, 3), num_classes=10):
     Args:
         arch: Architecture dict with 'num_stages', 'blocks_per_stage',
               'filters_per_stage', 'mul_map_files'
+              blocks_per_stage can be:
+              - Single integer: 3 blocks per stage (OLD)
+              - List of integers: [3, 3, 3] variable blocks per stage (NEW)
     """
     num_stages = arch['num_stages']
-    blocks_per_stage = arch['blocks_per_stage']
+    blocks_per_stage_raw = arch['blocks_per_stage']
+    # Handle both formats: integer or list
+    if isinstance(blocks_per_stage_raw, int):
+        blocks_per_stage = [blocks_per_stage_raw] * num_stages
+    else:
+        blocks_per_stage = blocks_per_stage_raw
     filters_per_stage = arch['filters_per_stage']
     mul_map_files = arch['mul_map_files']
 
@@ -193,24 +212,27 @@ def build_resnet20_approx(arch, input_shape=(32, 32, 3), num_classes=10):
     x = BatchNormalization(name='init_bn')(x)
     x = Activation('relu', name='init_relu')(x)
 
-    # Build stages dynamically with approximate multipliers
+    # Build stages dynamically with approximate multipliers and variable blocks
+    total_conv_layers = 0
     for stage_idx in range(num_stages):
         filters = filters_per_stage[stage_idx]
         mul_map = mul_map_files[stage_idx]
+        num_blocks = blocks_per_stage[stage_idx]  # Variable blocks per stage
         stride = 2 if stage_idx > 0 else 1  # Downsample after first stage
 
-        for block_idx in range(blocks_per_stage):
+        for block_idx in range(num_blocks):
             # First block of stage downsamples, rest maintain size
             block_stride = stride if block_idx == 0 else 1
             x = residual_block_approx(
                 x, filters, mul_map, stride=block_stride,
                 name=f'stage{stage_idx+1}_block{block_idx+1}'
             )
+            total_conv_layers += 2  # Each block has 2 conv layers
 
     # Output - keep exact
     x = GlobalAveragePooling2D(name='global_pool')(x)
     outputs = Dense(num_classes, activation='softmax', name='output')(x)
 
-    total_layers = 1 + num_stages * blocks_per_stage * 2 + 1
+    total_layers = 1 + total_conv_layers + 1
     model = Model(inputs, outputs, name=f'ResNet{total_layers}_CIFAR10_Approx')
     return model

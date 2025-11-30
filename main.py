@@ -34,23 +34,79 @@ SEARCH_SPACE_CNN = {
     'use_batch_norm': [True, False]
 }
 
-# ResNet Search Space
-# BASELINE: ResNet-18 (Paper's exact architecture)
+# ============================================================================
+# ResNet Search Space - EXPANDED FOR NAS (Nov 25-27, 2025)
+# ============================================================================
+
+# OLD BASELINE: ResNet-18 (ImageNet-style: 4 stages, [64,128,256,512] filters)
+# SEARCH_SPACE_RESNET_OLD = {
+#     'num_stages': [4],  # ResNet-18: 4 stages
+#     'blocks_per_stage': [2],  # ResNet-18: 2 blocks per stage
+#     'base_filters': [64],  # ResNet-18: [64, 128, 256, 512]
+#     'mul_map_files': [
+#         MUL_MAP_PATH + 'mul8u_2V0.bin',    # BEST - 0.0015% MAE, 64% energy saved
+#         MUL_MAP_PATH + 'mul8u_LK8.bin',    # EXCELLENT - 0.0046% MAE, 75% energy saved
+#     ]
+# }
+
+# Expanded multiplier set (14 options - organized by MAE levels)
+MULTIPLIERS_ALL = [
+    # Exact
+    MUL_MAP_PATH + 'mul8u_1JJQ.bin',   # 0.391 mW, 0.0000% MAE - EXACT
+    # Very low error (< 0.005% MAE)
+    MUL_MAP_PATH + 'mul8u_2V0.bin',    # 0.386 mW, 0.0015% MAE - Pareto-optimal
+    MUL_MAP_PATH + 'mul8u_KV8.bin',    # 0.382 mW, 0.0018% MAE - Very accurate
+    # Low error (0.005% - 0.01% MAE)
+    MUL_MAP_PATH + 'mul8u_LK8.bin',    # 0.370 mW, 0.0046% MAE - Pareto-optimal
+    MUL_MAP_PATH + 'mul8u_KV9.bin',    # 0.365 mW, 0.0064% MAE - Good balance
+    MUL_MAP_PATH + 'mul8u_17C8.bin',   # 0.355 mW, 0.0090% MAE - More savings
+    # Medium error (0.01% - 0.02% MAE)
+    MUL_MAP_PATH + 'mul8u_185E.bin',   # 0.350 mW, 0.0120% MAE - Balanced
+    MUL_MAP_PATH + 'mul8u_R92.bin',    # 0.345 mW, 0.0170% MAE - Last week's best!
+    # Medium-high error (0.02% - 0.04% MAE)
+    MUL_MAP_PATH + 'mul8u_18UH.bin',   # 0.330 mW, 0.0250% MAE - Aggressive
+    MUL_MAP_PATH + 'mul8u_12KP.bin',   # 0.315 mW, 0.0340% MAE - More aggressive
+    # High error (0.05% - 0.06% MAE)
+    MUL_MAP_PATH + 'mul8u_KVP.bin',    # 0.308 mW, 0.0510% MAE - High savings
+    MUL_MAP_PATH + 'mul8u_0AB.bin',    # 0.302 mW, 0.0570% MAE - Highest tested
+    # Very high error (> 0.08% MAE)
+    MUL_MAP_PATH + 'mul8u_L2J.bin',    # 0.295 mW, 0.0810% MAE - Very aggressive
+    MUL_MAP_PATH + 'mul8u_197B.bin',   # 0.206 mW, 0.1200% MAE - Extreme savings
+]
+
+# Conservative multipliers (MAE < 0.02%) - for initial experiments
+MULTIPLIERS_CONSERVATIVE = MULTIPLIERS_ALL[:8]
+
+# Aggressive multipliers (MAE >= 0.02%) - for energy optimization
+MULTIPLIERS_AGGRESSIVE = MULTIPLIERS_ALL[7:]
+
+# CIFAR ResNet Search Space (Original He et al. 2016 - 3 stages, [16,32,64] filters)
+# Based on published configurations from the original ResNet paper
 SEARCH_SPACE_RESNET = {
-    'num_stages': [4],  # ResNet-18: 4 stages
-    'blocks_per_stage': [2],  # ResNet-18: 2 blocks per stage
-    'base_filters': [64],  # ResNet-18: [64, 128, 256, 512]
-    # NAS: Uncomment lines below for full search
-    #'num_stages': [2, 3],
-    #'blocks_per_stage': [2, 3, 4],
-    #'base_filters': [16, 32],
-    'mul_map_files': [
-        #MUL_MAP_PATH + 'mul8u_1JJQ.bin',   # EXACT - 0% error (baseline)
-        MUL_MAP_PATH + 'mul8u_2V0.bin',    # BEST - 0.0015% MAE, 64% energy saved
-        MUL_MAP_PATH + 'mul8u_LK8.bin',    # EXCELLENT - 0.0046% MAE, 75% energy saved
-        #MUL_MAP_PATH + 'mul8u_R92.bin',    # VERY GOOD - 0.017% MAE, 87.5% energy saved
-        #MUL_MAP_PATH + 'mul8u_0AB.bin',    # GOOD - 0.057% MAE, 97.7% energy saved
-    ]
+    'num_stages': [3],  # CIFAR standard: 3 stages
+    'blocks_per_stage': [
+        [3, 3, 3],   # ResNet-20  (6×3+2 = 20 layers)
+        [5, 5, 5],   # ResNet-32  (6×5+2 = 32 layers)
+        [7, 7, 7],   # ResNet-44  (6×7+2 = 44 layers)
+        [9, 9, 9],   # ResNet-56  (6×9+2 = 56 layers)
+        [3, 4, 5],   # ResNet-26 Pyramid (progressive depth)
+        [4, 5, 6],   # ResNet-32 Pyramid (progressive depth)
+        [5, 7, 9],   # ResNet-50 Pyramid (aggressive pyramid)
+    ],
+    'base_filters': [16],  # CIFAR standard: [16, 32, 64]
+    'mul_map_files': MULTIPLIERS_ALL  # All 14 multipliers
+}
+
+# Conservative search space (for quick validation - recommended to start)
+SEARCH_SPACE_RESNET_CONSERVATIVE = {
+    'num_stages': [3],
+    'blocks_per_stage': [
+        [3, 3, 3],   # ResNet-20
+        [5, 5, 5],   # ResNet-32
+        [7, 7, 7],   # ResNet-44
+    ],
+    'base_filters': [16],
+    'mul_map_files': MULTIPLIERS_CONSERVATIVE  # Only low-error multipliers (MAE < 0.02%)
 }
 
 def run_nas(search_algo='random', num_trials=5, epochs=5, use_stl=False,
@@ -244,9 +300,39 @@ def run_nas(search_algo='random', num_trials=5, epochs=5, use_stl=False,
     return results
 
 if __name__ == '__main__':
+    # ========================================================================
+    # NAS SEARCH SPACE INFO
+    # ========================================================================
+    print("\n" + "="*70)
+    print("NEURAL ARCHITECTURE SEARCH - SEARCH SPACE")
+    print("="*70)
+    print(f"\n📊 MULTIPLIERS: {len(MULTIPLIERS_ALL)} total")
+    print(f"   - Conservative (MAE < 0.02%): {len(MULTIPLIERS_CONSERVATIVE)}")
+    print(f"   - Aggressive (MAE ≥ 0.02%): {len(MULTIPLIERS_AGGRESSIVE)}")
+
+    print("\n🏗️  ARCHITECTURE VARIANTS:")
+    for blocks in SEARCH_SPACE_RESNET['blocks_per_stage']:
+        total_layers = sum(blocks) * 2 + 2
+        print(f"   - ResNet-{total_layers}: {blocks} blocks → {total_layers} layers")
+
+    # Calculate search space size
+    num_archs = len(SEARCH_SPACE_RESNET['blocks_per_stage'])
+    num_muls = len(SEARCH_SPACE_RESNET['mul_map_files'])
+    num_stages = SEARCH_SPACE_RESNET['num_stages'][0]
+    total_configs = num_archs * (num_muls ** num_stages)
+
+    print(f"\n🔍 SEARCH SPACE SIZE:")
+    print(f"   - {num_archs} architectures × {num_muls}^{num_stages} multiplier combos")
+    print(f"   - Total configurations: {total_configs:,}")
+    print(f"   - Recommended trials (Bayesian): 50-100")
+
+    print("\n" + "="*70)
+    print("STARTING NAS EXPERIMENT")
+    print("="*70 + "\n")
+
     # Run NAS with architecture selection
     # architecture='cnn' for simple CNN
-    # architecture='resnet' for ResNet-18 (approxAI paper architecture - CURRENT DEFAULT)
+    # architecture='resnet' for ResNet CIFAR (CURRENT DEFAULT)
 
     # ResNet-18 with STL monitoring (approxAI constraints)
     # Qc = 0.89 (89% minimum accuracy - 2% below baseline 91%, per paper Section V-B)

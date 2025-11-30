@@ -70,7 +70,21 @@ class BayesianNAS:
         if 'num_stages' in arch:
             # ResNet architecture
             encoding.append(arch['num_stages'])
-            encoding.append(arch['blocks_per_stage'])
+
+            # Handle blocks_per_stage (can be int or list)
+            blocks_per_stage_raw = arch['blocks_per_stage']
+            if isinstance(blocks_per_stage_raw, int):
+                blocks_list = [blocks_per_stage_raw] * arch['num_stages']
+            else:
+                blocks_list = blocks_per_stage_raw
+
+            # Encode each stage's block count (pad to max 4 stages)
+            for i in range(4):
+                if i < len(blocks_list):
+                    encoding.append(blocks_list[i])
+                else:
+                    encoding.append(0)  # Pad with zeros
+
             # Use first filter value (base_filters) from filters_per_stage
             encoding.append(arch['filters_per_stage'][0])
 
@@ -81,6 +95,9 @@ class BayesianNAS:
                     encoding.append(mul_options.index(mul))
                 except ValueError:
                     encoding.append(0)  # Default if not found
+            # Pad multipliers to max 4 stages
+            for i in range(4 - len(arch['mul_map_files'])):
+                encoding.append(0)
         else:
             # CNN architecture
             encoding.append(arch['num_conv_layers'])
