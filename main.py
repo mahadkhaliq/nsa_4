@@ -104,13 +104,15 @@ SEARCH_SPACE_RESNET_CONSERVATIVE = {
 }
 
 def run_nas(search_algo='random', num_trials=5, epochs=5, use_stl=False,
-            quality_constraint=0.70, energy_constraint=50.0, architecture='cnn'):
+            quality_constraint=0.70, energy_constraint=50.0, architecture='cnn',
+            batch_size=256):
     """Run NAS with specified search algorithm
 
     Args:
         search_algo: 'random', 'grid', or 'bayesian'
         num_trials: Number of architectures to evaluate
         epochs: Training epochs per architecture
+        batch_size: Batch size for training (default 256 for 32GB V100)
         use_stl: Enable STL monitoring (approxAI constraints)
         quality_constraint: Qc - minimum accuracy threshold (approxAI)
         energy_constraint: Ec - maximum energy in mJ (approxAI)
@@ -177,7 +179,7 @@ def run_nas(search_algo='random', num_trials=5, epochs=5, use_stl=False,
         print(f"Architecture: {arch}")
 
         result = train_and_evaluate(arch, x_train, y_train, x_test, y_test, epochs,
-                                   use_stl, quality_constraint, energy_constraint, use_resnet)
+                                   use_stl, quality_constraint, energy_constraint, use_resnet, batch_size)
         result['arch'] = arch
         results.append(result)
 

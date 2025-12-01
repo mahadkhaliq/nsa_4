@@ -22,7 +22,8 @@ def lr_schedule(epoch):
         return 0.00001
 
 def train_and_evaluate(arch, x_train, y_train, x_test, y_test, epochs=10, use_stl=False,
-                      quality_constraint=0.70, energy_constraint=50.0, use_resnet=False):
+                      quality_constraint=0.70, energy_constraint=50.0, use_resnet=False,
+                      batch_size=256):
     """Train with exact multipliers, evaluate with both exact and approximate
 
     Args:
@@ -34,6 +35,7 @@ def train_and_evaluate(arch, x_train, y_train, x_test, y_test, epochs=10, use_st
         quality_constraint: Qc - minimum accuracy (approxAI)
         energy_constraint: Ec - maximum energy in mJ (approxAI)
         use_resnet: If True, use ResNet-20; if False, use simple CNN
+        batch_size: Batch size for training and evaluation (default 256 for 32GB V100)
     """
 
     # Train with exact multipliers
@@ -65,13 +67,13 @@ def train_and_evaluate(arch, x_train, y_train, x_test, y_test, epochs=10, use_st
     callbacks = [LearningRateScheduler(lr_schedule)]
 
     history = model.fit(
-        datagen.flow(x_train_split, y_train_split, batch_size=128),
+        datagen.flow(x_train_split, y_train_split, batch_size=batch_size),
         validation_data=(x_val, y_val),
         epochs=epochs,
         callbacks=callbacks,
         verbose=1,
-        steps_per_epoch=len(x_train_split) // 128,
-        workers=2,              # Parallel data loading (reduced to avoid file descriptor limit)
+        steps_per_epoch=len(x_train_split) // batch_size,
+        workers=4,              # Increased for 32GB V100 (faster data loading)
         use_multiprocessing=False  # Use threading instead of multiprocessing to avoid "too many open files"
     )
 
@@ -80,7 +82,7 @@ def train_and_evaluate(arch, x_train, y_train, x_test, y_test, epochs=10, use_st
     model.save_weights(weights_file)
 
     # Evaluate with exact
-    exact_score = model.evaluate(x_test, y_test, verbose=0)
+    exact_score = model.evaluate(x_test, y_test, verbose=0, batch_size=batch_size)
 
     # Evaluate with approximate multipliers if specified
     approx_score = None
@@ -97,7 +99,7 @@ def train_and_evaluate(arch, x_train, y_train, x_test, y_test, epochs=10, use_st
         approx_model.build(input_shape=(None, 32, 32, 3))
         approx_model.load_weights(weights_file)
         approx_model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
-        approx_score = approx_model.evaluate(x_test, y_test, verbose=0)
+        approx_score = approx_model.evaluate(x_test, y_test, verbose=0, batch_size=batch_size)
 
         # Calculate energy with per-layer breakdown
         energy, energy_per_layer = estimate_network_energy(arch)
