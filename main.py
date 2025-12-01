@@ -49,36 +49,30 @@ SEARCH_SPACE_CNN = {
 #     ]
 # }
 
-# Expanded multiplier set (14 options - organized by MAE levels)
+# Multiplier set (8 options - only available files)
 MULTIPLIERS_ALL = [
     # Exact
     MUL_MAP_PATH + 'mul8u_1JJQ.bin',   # 0.391 mW, 0.0000% MAE - EXACT
     # Very low error (< 0.005% MAE)
     MUL_MAP_PATH + 'mul8u_2V0.bin',    # 0.386 mW, 0.0015% MAE - Pareto-optimal
-    MUL_MAP_PATH + 'mul8u_KV8.bin',    # 0.382 mW, 0.0018% MAE - Very accurate
     # Low error (0.005% - 0.01% MAE)
     MUL_MAP_PATH + 'mul8u_LK8.bin',    # 0.370 mW, 0.0046% MAE - Pareto-optimal
-    MUL_MAP_PATH + 'mul8u_KV9.bin',    # 0.365 mW, 0.0064% MAE - Good balance
     MUL_MAP_PATH + 'mul8u_17C8.bin',   # 0.355 mW, 0.0090% MAE - More savings
     # Medium error (0.01% - 0.02% MAE)
-    MUL_MAP_PATH + 'mul8u_185E.bin',   # 0.350 mW, 0.0120% MAE - Balanced
     MUL_MAP_PATH + 'mul8u_R92.bin',    # 0.345 mW, 0.0170% MAE - Last week's best!
     # Medium-high error (0.02% - 0.04% MAE)
     MUL_MAP_PATH + 'mul8u_18UH.bin',   # 0.330 mW, 0.0250% MAE - Aggressive
-    MUL_MAP_PATH + 'mul8u_12KP.bin',   # 0.315 mW, 0.0340% MAE - More aggressive
     # High error (0.05% - 0.06% MAE)
-    MUL_MAP_PATH + 'mul8u_KVP.bin',    # 0.308 mW, 0.0510% MAE - High savings
     MUL_MAP_PATH + 'mul8u_0AB.bin',    # 0.302 mW, 0.0570% MAE - Highest tested
     # Very high error (> 0.08% MAE)
-    MUL_MAP_PATH + 'mul8u_L2J.bin',    # 0.295 mW, 0.0810% MAE - Very aggressive
     MUL_MAP_PATH + 'mul8u_197B.bin',   # 0.206 mW, 0.1200% MAE - Extreme savings
 ]
 
 # Conservative multipliers (MAE < 0.02%) - for initial experiments
-MULTIPLIERS_CONSERVATIVE = MULTIPLIERS_ALL[:8]
+MULTIPLIERS_CONSERVATIVE = MULTIPLIERS_ALL[:5]  # Exact + Very low + Low + Medium
 
 # Aggressive multipliers (MAE >= 0.02%) - for energy optimization
-MULTIPLIERS_AGGRESSIVE = MULTIPLIERS_ALL[7:]
+MULTIPLIERS_AGGRESSIVE = MULTIPLIERS_ALL[4:]  # Medium + Medium-high + High + Very high
 
 # CIFAR ResNet Search Space (Original He et al. 2016 - 3 stages, [16,32,64] filters)
 # Based on published configurations from the original ResNet paper

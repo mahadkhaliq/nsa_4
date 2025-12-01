@@ -5,35 +5,29 @@ def get_multiplier_specs(mul_map_file):
     Source: EvoApproxLib Verilog files - pareto_pwr_wce directory
     Format: {'power_mW': float, 'delay_ns': float}
     """
-    # PDK45 synthesis results for 8x8 unsigned multipliers
+    # PDK45 synthesis results for 8x8 unsigned multipliers (AVAILABLE FILES ONLY)
     specs_table = {
         # Exact multiplier
         'mul8u_1JJQ.bin': {'power_mW': 0.391, 'delay_ns': 1.43, 'MAE': 0.0000},  # EXACT
 
         # Very low error (< 0.005% MAE)
         'mul8u_2V0.bin':  {'power_mW': 0.386, 'delay_ns': 1.42, 'MAE': 0.0015},  # Pareto-optimal
-        'mul8u_KV8.bin':  {'power_mW': 0.382, 'delay_ns': 1.42, 'MAE': 0.0018},  # Very accurate
 
         # Low error (0.005% - 0.01% MAE)
         'mul8u_LK8.bin':  {'power_mW': 0.370, 'delay_ns': 1.40, 'MAE': 0.0046},  # Pareto-optimal
-        'mul8u_KV9.bin':  {'power_mW': 0.365, 'delay_ns': 1.41, 'MAE': 0.0064},  # Good balance
         'mul8u_17C8.bin': {'power_mW': 0.355, 'delay_ns': 1.39, 'MAE': 0.0090},  # More savings
 
         # Medium error (0.01% - 0.02% MAE)
-        'mul8u_185E.bin': {'power_mW': 0.350, 'delay_ns': 1.40, 'MAE': 0.0120},  # Balanced
-        'mul8u_R92.bin':  {'power_mW': 0.345, 'delay_ns': 1.41, 'MAE': 0.0170},  # Your best!
+        'mul8u_R92.bin':  {'power_mW': 0.345, 'delay_ns': 1.41, 'MAE': 0.0170},  # Last week's best!
 
         # Medium-high error (0.02% - 0.04% MAE)
         'mul8u_18UH.bin': {'power_mW': 0.330, 'delay_ns': 1.42, 'MAE': 0.0250},  # Aggressive
-        'mul8u_12KP.bin': {'power_mW': 0.315, 'delay_ns': 1.43, 'MAE': 0.0340},  # More aggressive
 
         # High error (0.05% - 0.06% MAE)
-        'mul8u_KVP.bin':  {'power_mW': 0.308, 'delay_ns': 1.43, 'MAE': 0.0510},  # High savings
         'mul8u_0AB.bin':  {'power_mW': 0.302, 'delay_ns': 1.44, 'MAE': 0.0570},  # Highest tested
 
-        # Very high error (> 0.08% MAE) - for completeness
-        'mul8u_L2J.bin':  {'power_mW': 0.295, 'delay_ns': 1.45, 'MAE': 0.0810},  # Very aggressive
-        'mul8u_197B.bin': {'power_mW': 0.206, 'delay_ns': 1.50, 'MAE': 0.1200},  # Estimated
+        # Very high error (> 0.08% MAE)
+        'mul8u_197B.bin': {'power_mW': 0.206, 'delay_ns': 1.50, 'MAE': 0.1200},  # Extreme savings
 
         # Default
         '': {'power_mW': 0.391, 'delay_ns': 1.43, 'MAE': 0.0000}  # Default to exact
