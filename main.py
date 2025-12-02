@@ -34,9 +34,7 @@ SEARCH_SPACE_CNN = {
     'use_batch_norm': [True, False]
 }
 
-# ============================================================================
 # ResNet Search Space - EXPANDED FOR NAS (Nov 25-27, 2025)
-# ============================================================================
 
 # OLD BASELINE: ResNet-18 (ImageNet-style: 4 stages, [64,128,256,512] filters)
 # SEARCH_SPACE_RESNET_OLD = {
@@ -79,16 +77,20 @@ MULTIPLIERS_AGGRESSIVE = MULTIPLIERS_ALL[4:]  # Medium + Medium-high + High + Ve
 SEARCH_SPACE_RESNET = {
     'num_stages': [3],  # CIFAR standard: 3 stages
     'blocks_per_stage': [
-        [3, 3, 3],   # ResNet-20  (6×3+2 = 20 layers)
-        [5, 5, 5],   # ResNet-32  (6×5+2 = 32 layers)
-        [7, 7, 7],   # ResNet-44  (6×7+2 = 44 layers)
-        [9, 9, 9],   # ResNet-56  (6×9+2 = 56 layers)
+        [3, 3, 3],   # ResNet-20  (6×3+2 = 20 layers) - Symmetric baseline
+        [5, 5, 5],   # ResNet-32  (6×5+2 = 32 layers) - Symmetric
+        [7, 7, 7],   # ResNet-44  (6×7+2 = 44 layers) - Symmetric
+        [9, 9, 9],   # ResNet-56  (6×9+2 = 56 layers) - Symmetric deep
         [3, 4, 5],   # ResNet-26 Pyramid (progressive depth)
         [4, 5, 6],   # ResNet-32 Pyramid (progressive depth)
         [5, 7, 9],   # ResNet-50 Pyramid (aggressive pyramid)
+        [6, 4, 2],   # ResNet-26 Early-heavy (more capacity at input)
+        [2, 4, 6],   # ResNet-26 Late-heavy (more capacity at output)
+        [3, 6, 3],   # ResNet-26 Hourglass (middle-heavy)
+        [4, 6, 4],   # ResNet-30 Hourglass (balanced middle emphasis)
     ],
     'base_filters': [16],  # CIFAR standard: [16, 32, 64]
-    'mul_map_files': MULTIPLIERS_ALL  # All 14 multipliers
+    'mul_map_files': MULTIPLIERS_ALL  # All 8 multipliers
 }
 
 # Conservative search space (for quick validation - recommended to start)
@@ -296,9 +298,7 @@ def run_nas(search_algo='random', num_trials=5, epochs=5, use_stl=False,
     return results
 
 if __name__ == '__main__':
-    # ========================================================================
     # NAS SEARCH SPACE INFO
-    # ========================================================================
     print("\n" + "="*70)
     print("NEURAL ARCHITECTURE SEARCH - SEARCH SPACE")
     print("="*70)
