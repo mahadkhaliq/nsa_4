@@ -73,13 +73,14 @@ def count_conv_macs(in_channels, out_channels, kernel_size, feature_map_size):
     """
     return in_channels * out_channels * (kernel_size ** 2) * feature_map_size
 
-def estimate_network_energy(arch, num_operations=1e9):
+def estimate_network_energy(arch, num_operations=1e9, input_size=32):
     """Estimate total network energy consumption using MAC-based model
 
     Args:
         arch: Network architecture dict
               ResNet: has 'num_stages', 'blocks_per_stage', 'filters_per_stage'
               CNN: has 'num_conv_layers', 'filters', 'kernels'
+        input_size: Spatial dimension of input (default 32 for CIFAR-10, use 28 for FashionMNIST)
 
     Returns:
         energy: Total energy in microjoules (µJ)
@@ -104,9 +105,10 @@ def estimate_network_energy(arch, num_operations=1e9):
             blocks_per_stage = blocks_per_stage_raw
         filters_per_stage = arch['filters_per_stage']
 
-        # Feature map sizes for CIFAR-10 (32x32 input, stride-2 downsample per stage)
-        # ResNet-20: Stage 0 (32×32), Stage 1 (16×16), Stage 2 (8×8)
-        feature_map_sizes = [32 * 32 // (2 ** i) for i in range(num_stages)]
+        # Feature map sizes based on input_size (stride-2 downsample per stage)
+        # CIFAR-10 (input_size=32): Stage 0 (32×32=1024), Stage 1 (16×16=256), Stage 2 (8×8=64)
+        # FashionMNIST (input_size=28): Stage 0 (28×28=784), Stage 1 (14×14=196), Stage 2 (7×7=49)
+        feature_map_sizes = [input_size * input_size // (2 ** i) for i in range(num_stages)]
 
         # Initial conv layer (usually 3→16 channels for CIFAR, 3×3 kernel on 32×32)
         # Assuming first stage handles this

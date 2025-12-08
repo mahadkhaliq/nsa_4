@@ -13,155 +13,104 @@ try:
 except:
     pass
 
-# Dataset will be loaded inside run_nas() based on dataset parameter
 
-# Search space
 MUL_MAP_PATH = './multipliers/'
 
-# CNN Search Space (for simple CNN architecture)
 SEARCH_SPACE_CNN = {
     'num_conv_layers': [2, 3, 4],
     'filters': [16, 32, 64, 128],
     'kernel_sizes': [3, 5],
     'dense_units': [64, 128, 256],
     'mul_map_files': [
-        #MUL_MAP_PATH + 'mul8u_197B.bin',   # 0.206 mW - medium balance
-        MUL_MAP_PATH + 'mul8u_1JJQ.bin',   # 0.391 mW - best performing
-        MUL_MAP_PATH + 'mul8u_2V0.bin',    # BEST - 0.0015% MAE, 64% energy saved
-        #MUL_MAP_PATH + 'mul8u_0AB.bin',    # 0.302 mW - medium-high
+        MUL_MAP_PATH + 'mul8u_1JJQ.bin',
+        MUL_MAP_PATH + 'mul8u_2V0.bin',
     ],
     'use_batch_norm': [True, False]
 }
 
-# ResNet Search Space - EXPANDED FOR NAS (Nov 25-27, 2025)
 
-# OLD BASELINE: ResNet-18 (ImageNet-style: 4 stages, [64,128,256,512] filters)
-# SEARCH_SPACE_RESNET_OLD = {
-#     'num_stages': [4],  # ResNet-18: 4 stages
-#     'blocks_per_stage': [2],  # ResNet-18: 2 blocks per stage
-#     'base_filters': [64],  # ResNet-18: [64, 128, 256, 512]
-#     'mul_map_files': [
-#         MUL_MAP_PATH + 'mul8u_2V0.bin',    # BEST - 0.0015% MAE, 64% energy saved
-#         MUL_MAP_PATH + 'mul8u_LK8.bin',    # EXCELLENT - 0.0046% MAE, 75% energy saved
-#     ]
-# }
 
-# Multiplier set (8 options - only available files)
 MULTIPLIERS_ALL = [
-    # Exact
-    MUL_MAP_PATH + 'mul8u_1JJQ.bin',   # 0.391 mW, 0.0000% MAE - EXACT
-    # Very low error (< 0.005% MAE)
-    MUL_MAP_PATH + 'mul8u_2V0.bin',    # 0.386 mW, 0.0015% MAE - Pareto-optimal
-    # Low error (0.005% - 0.01% MAE)
-    MUL_MAP_PATH + 'mul8u_LK8.bin',    # 0.370 mW, 0.0046% MAE - Pareto-optimal
-    MUL_MAP_PATH + 'mul8u_17C8.bin',   # 0.355 mW, 0.0090% MAE - More savings
-    # Medium error (0.01% - 0.02% MAE)
-    MUL_MAP_PATH + 'mul8u_R92.bin',    # 0.345 mW, 0.0170% MAE - Last week's best!
-    # Medium-high error (0.02% - 0.04% MAE)
-    MUL_MAP_PATH + 'mul8u_18UH.bin',   # 0.330 mW, 0.0250% MAE - Aggressive
-    # High error (0.05% - 0.06% MAE)
-    MUL_MAP_PATH + 'mul8u_0AB.bin',    # 0.302 mW, 0.0570% MAE - Highest tested
-    # Very high error (> 0.08% MAE)
-    MUL_MAP_PATH + 'mul8u_197B.bin',   # 0.206 mW, 0.1200% MAE - Extreme savings
+    MUL_MAP_PATH + 'mul8u_1JJQ.bin',
+    MUL_MAP_PATH + 'mul8u_2V0.bin',
+    MUL_MAP_PATH + 'mul8u_LK8.bin',
+    MUL_MAP_PATH + 'mul8u_17C8.bin',
+    MUL_MAP_PATH + 'mul8u_R92.bin',
+    MUL_MAP_PATH + 'mul8u_18UH.bin',
+    MUL_MAP_PATH + 'mul8u_0AB.bin',
+    MUL_MAP_PATH + 'mul8u_197B.bin',
 ]
 
-# Conservative multipliers (MAE < 0.02%) - for initial experiments
-MULTIPLIERS_CONSERVATIVE = MULTIPLIERS_ALL[:5]  # Exact + Very low + Low + Medium
+MULTIPLIERS_CONSERVATIVE = MULTIPLIERS_ALL[:5]
 
-# Aggressive multipliers (MAE >= 0.02%) - for energy optimization
-MULTIPLIERS_AGGRESSIVE = MULTIPLIERS_ALL[4:]  # Medium + Medium-high + High + Very high
+MULTIPLIERS_AGGRESSIVE = MULTIPLIERS_ALL[4:]
 
-# CIFAR ResNet Search Space (Original He et al. 2016 - 3 stages, [16,32,64] filters)
-# Based on published configurations from the original ResNet paper
 SEARCH_SPACE_RESNET = {
-    'num_stages': [3],  # CIFAR standard: 3 stages
+    'num_stages': [3],
     'blocks_per_stage': [
-        [3, 3, 3],   # ResNet-20  (6×3+2 = 20 layers) - Symmetric baseline
-        [5, 5, 5],   # ResNet-32  (6×5+2 = 32 layers) - Symmetric
-        [7, 7, 7],   # ResNet-44  (6×7+2 = 44 layers) - Symmetric
-        [9, 9, 9],   # ResNet-56  (6×9+2 = 56 layers) - Symmetric deep
-        [3, 4, 5],   # ResNet-26 Pyramid (progressive depth)
-        [4, 5, 6],   # ResNet-32 Pyramid (progressive depth)
-        [5, 7, 9],   # ResNet-50 Pyramid (aggressive pyramid)
-        [6, 4, 2],   # ResNet-26 Early-heavy (more capacity at input)
-        [2, 4, 6],   # ResNet-26 Late-heavy (more capacity at output)
-        [3, 6, 3],   # ResNet-26 Hourglass (middle-heavy)
-        [4, 6, 4],   # ResNet-30 Hourglass (balanced middle emphasis)
+        [3, 3, 3],
+        [5, 5, 5],
+        [7, 7, 7],
+        [9, 9, 9],
+        [3, 4, 5],
+        [4, 5, 6],
+        [5, 7, 9],
+        [6, 4, 2],
+        [2, 4, 6],
+        [3, 6, 3],
+        [4, 6, 4],
     ],
-    'base_filters': [16],  # CIFAR standard: [16, 32, 64]
-    'mul_map_files': MULTIPLIERS_ALL  # All 8 multipliers
+    'base_filters': [16],
+    'mul_map_files': MULTIPLIERS_ALL
 }
 
-# Conservative search space (for quick validation - recommended to start)
 SEARCH_SPACE_RESNET_CONSERVATIVE = {
     'num_stages': [3],
     'blocks_per_stage': [
-        [3, 3, 3],   # ResNet-20
-        [5, 5, 5],   # ResNet-32
-        [7, 7, 7],   # ResNet-44
+        [3, 3, 3],
+        [5, 5, 5],
+        [7, 7, 7],
     ],
     'base_filters': [16],
-    'mul_map_files': MULTIPLIERS_CONSERVATIVE  # Only low-error multipliers (MAE < 0.02%)
+    'mul_map_files': MULTIPLIERS_CONSERVATIVE
 }
 
-# FashionMNIST ResNet Search Space (28×28 grayscale input)
-# FashionMNIST: 60k training images, 10k test, 10 classes (clothing)
-# Expected accuracy: 92-95% exact, 90-94% approximate
 SEARCH_SPACE_RESNET_FASHIONMNIST = {
-    'num_stages': [3],  # 3 stages: 28×28 → 14×14 → 7×7
+    'num_stages': [3],
     'blocks_per_stage': [
-        [2, 2, 2],   # ResNet-14 (lightweight, faster training)
-        [3, 3, 3],   # ResNet-20 (balanced)
-        [4, 4, 4],   # ResNet-26 (deeper capacity)
-        [2, 3, 4],   # Progressive depth (increasing)
-        [4, 3, 2],   # Early-heavy (more capacity at input)
-        [2, 4, 2],   # Hourglass (middle emphasis)
+        [2, 2, 2],
+        [3, 3, 3],
+        [4, 4, 4],
+        [2, 3, 4],
+        [4, 3, 2],
+        [2, 4, 2],
     ],
-    'base_filters': [16],  # [16, 32, 64] filters per stage
-    'mul_map_files': MULTIPLIERS_ALL  # Comment out unwanted multipliers above
+    'base_filters': [16],
+    'mul_map_files': MULTIPLIERS_ALL
 }
 
 def run_nas(search_algo='random', num_trials=5, epochs=5, use_stl=False,
             quality_constraint=0.70, energy_constraint=50.0, architecture='cnn',
             dataset='cifar10', batch_size=256):
-    """Run NAS with specified search algorithm
 
-    Args:
-        search_algo: 'random', 'grid', or 'bayesian'
-        num_trials: Number of architectures to evaluate
-        epochs: Training epochs per architecture
-        batch_size: Batch size for training (default 256 for 32GB V100)
-        use_stl: Enable STL monitoring (approxAI constraints)
-        quality_constraint: Qc - minimum accuracy threshold (approxAI)
-        energy_constraint: Ec - maximum energy in mJ (approxAI)
-        architecture: 'cnn' for simple CNN or 'resnet' for ResNet-20
-        dataset: 'cifar10' or 'fashionmnist' (default: 'cifar10' for backward compatibility)
-    """
-
-    # Select search space and input shape based on dataset and architecture
     use_resnet = (architecture.lower() == 'resnet')
 
-    # Dataset-specific configuration
     if dataset.lower() == 'fashionmnist':
         search_space = SEARCH_SPACE_RESNET_FASHIONMNIST if use_resnet else SEARCH_SPACE_CNN
-        input_shape = (28, 28, 1)  # Grayscale 28×28
+        input_shape = (28, 28, 1)
         num_classes = 10
-    else:  # Default to CIFAR-10 (backward compatible)
+    else:
         search_space = SEARCH_SPACE_RESNET if use_resnet else SEARCH_SPACE_CNN
-        input_shape = (32, 32, 3)  # RGB 32×32
+        input_shape = (32, 32, 3)
         num_classes = 10
 
-    # Load dataset
     (x_train, y_train), (x_test, y_test) = load_dataset(dataset)
 
-    # Initialize logger
     experiment_name = f"{dataset}_{architecture}_{search_algo}_{epochs}ep"
     logger = NASLogger(log_dir='logs', experiment_name=experiment_name)
 
-    # Setup plot directories
     plot_dirs = setup_plot_dirs(experiment_name, base_dir='plots')
 
-    # Log experiment configuration
     config = {
         'architecture': 'ResNet-18' if use_resnet else 'Simple CNN',
         'search_algorithm': search_algo,
@@ -180,19 +129,15 @@ def run_nas(search_algo='random', num_trials=5, epochs=5, use_stl=False,
     print(f"Trials: {num_trials}, Epochs: {epochs}")
     print(f"{'='*60}\n")
 
-    # Get architectures to evaluate
     bayes_nas = None
     if search_algo == 'bayesian':
-        # Bayesian optimization - more efficient than random search
         objective = 'stl_robustness' if use_stl else 'accuracy'
         architectures, bayes_nas = bayesian_search(search_space, num_trials, objective)
         print(f"Using Bayesian optimization with objective: {objective}")
     elif use_resnet:
-        # ResNet: sample multiplier combinations for 3 stages
         from nas_search import sample_resnet_multipliers
         architectures = [sample_resnet_multipliers(search_space) for _ in range(num_trials)]
     else:
-        # CNN: use existing search
         if search_algo == 'random':
             architectures = random_search(search_space, num_trials)
         elif search_algo == 'grid':
@@ -214,11 +159,9 @@ def run_nas(search_algo='random', num_trials=5, epochs=5, use_stl=False,
         result['arch'] = arch
         results.append(result)
 
-        # Update Bayesian optimization if using it
         if bayes_nas is not None:
             bayes_nas.update_observations(arch, result)
 
-        # Log and print trial results
         logger.log_trial(i+1, len(architectures), arch, result)
 
         print(f"Exact accuracy: {result['exact_accuracy']:.4f}")
@@ -240,29 +183,23 @@ def run_nas(search_algo='random', num_trials=5, epochs=5, use_stl=False,
             status = "SATISFIED" if result['stl_robustness'] > 0 else "VIOLATED"
             print(f"STL robustness: {result['stl_robustness']:.4f} ({status})")
 
-        # Create architecture config string for plots
         if use_resnet:
             arch_config = f"ResNet: {arch['num_stages']} stages, {arch['blocks_per_stage']} blocks, {arch['filters_per_stage']}"
         else:
             arch_config = f"CNN: {arch['num_conv_layers']} layers, {arch['filters']} filters"
 
-        # Plot training curves if history is available
         if 'history' in result and result['history']:
             plot_training_curves(result['history'], trial_num=i+1, save_dir=plot_dirs['training'], arch_config=arch_config)
             logger.info(f"Training curves saved for trial {i+1}")
 
-        # Plot energy breakdown for this trial
         if result['energy_per_layer']:
             plot_energy_breakdown(result, trial_num=i+1, save_dir=plot_dirs['energy'], arch_config=arch_config)
             logger.info(f"Energy breakdown plot saved for trial {i+1}")
 
-    # Find best by accuracy
     best = max(results, key=lambda x: x['approx_accuracy'] if x['approx_accuracy'] else x['exact_accuracy'])
 
-    # Find Pareto-optimal solutions (approxAI methodology)
     pareto_indices = check_pareto_optimal(results)
 
-    # Log summary
     logger.log_summary(results)
 
     print(f"\n{'='*60}")
@@ -283,15 +220,12 @@ def run_nas(search_algo='random', num_trials=5, epochs=5, use_stl=False,
                 status = "SATISFIED" if r['stl_robustness'] > 0 else "VIOLATED"
                 print(f"    STL (Qc={quality_constraint}, Ec={energy_constraint}): {status}")
 
-    # Generate comprehensive plots
     logger.header("Generating publication-quality plots")
     print(f"\n{'='*60}")
     print("Generating publication-quality plots...")
     print(f"{'='*60}")
 
-    # Create architecture config string for summary plots
     if use_resnet:
-        # Get config from first result
         first_arch = results[0]['arch']
         arch_config = f"ResNet: {first_arch['num_stages']} stages, {first_arch['blocks_per_stage']} blocks, {first_arch['filters_per_stage']}"
     else:
@@ -311,10 +245,8 @@ def run_nas(search_algo='random', num_trials=5, epochs=5, use_stl=False,
         if plot_path:
             logger.info(f"  {plot_name}: {plot_path}")
 
-    # Save results to JSON
     logger.save_results()
 
-    # Print log file locations
     log_files = logger.get_log_files()
     print(f"\n{'='*60}")
     print("Experiment completed!")
@@ -327,7 +259,6 @@ def run_nas(search_algo='random', num_trials=5, epochs=5, use_stl=False,
     return results
 
 if __name__ == '__main__':
-    # NAS SEARCH SPACE INFO
     print("\n" + "="*70)
     print("NEURAL ARCHITECTURE SEARCH - SEARCH SPACE")
     print("="*70)
@@ -340,7 +271,6 @@ if __name__ == '__main__':
         total_layers = sum(blocks) * 2 + 2
         print(f"   - ResNet-{total_layers}: {blocks} blocks → {total_layers} layers")
 
-    # Calculate search space size
     num_archs = len(SEARCH_SPACE_RESNET['blocks_per_stage'])
     num_muls = len(SEARCH_SPACE_RESNET['mul_map_files'])
     num_stages = SEARCH_SPACE_RESNET['num_stages'][0]
@@ -355,47 +285,15 @@ if __name__ == '__main__':
     print("STARTING NAS EXPERIMENT")
     print("="*70 + "\n")
 
-    # Run NAS with architecture selection
-    # architecture='cnn' for simple CNN
-    # architecture='resnet' for ResNet CIFAR (CURRENT DEFAULT)
 
-    # ResNet-18 with STL monitoring (approxAI constraints)
-    # Qc = 0.89 (89% minimum accuracy - 2% below baseline 91%, per paper Section V-B)
-    # Ec = 100.0 mJ (maximum energy)
-    #
-    # Search algorithms:
-    # 'random': Random sampling (baseline)
-    # 'bayesian': Bayesian optimization (more efficient, recommended)
-    # 'grid': Exhaustive grid search (slow, for small spaces)
     results = run_nas(
-        search_algo='bayesian',  # Changed to Bayesian for better results
+        search_algo='bayesian',
         num_trials=20,
         epochs=60,
         use_stl=True,
-        quality_constraint=0.89,  # Paper: 2% below baseline (91% - 2% = 89%)
+        quality_constraint=0.89,
         energy_constraint=5000.0,
-        architecture='resnet'  # Using ResNet-20 from approxAI paper
+        architecture='resnet'
     )
 
-    # Example: Switch to CNN (uncomment to use)
-    # results = run_nas(
-    #     search_algo='random',
-    #     num_trials=60,
-    #     epochs=50,
-    #     use_stl=True,
-    #     quality_constraint=0.70,
-    #     energy_constraint=50.0,
-    #     architecture='cnn'
-    # )
 
-    # Example: FashionMNIST with ResNet (uncomment to use)
-    # results = run_nas(
-    #     search_algo='bayesian',
-    #     num_trials=20,
-    #     epochs=60,
-    #     use_stl=True,
-    #     quality_constraint=0.90,  # 90% for FashionMNIST (adjust based on baseline)
-    #     energy_constraint=500.0,  # Lower energy than CIFAR-10 (28×28 vs 32×32)
-    #     architecture='resnet',
-    #     dataset='fashionmnist'  # NEW! Switch to FashionMNIST
-    # )
