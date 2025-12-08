@@ -367,15 +367,17 @@ if __name__ == '__main__':
     # 'random': Random sampling (baseline)
     # 'bayesian': Bayesian optimization (more efficient, recommended)
     # 'grid': Exhaustive grid search (slow, for small spaces)
-    results = run_nas(
-        search_algo='bayesian',  # Changed to Bayesian for better results
-        num_trials=20,
-        epochs=60,
-        use_stl=True,
-        quality_constraint=0.89,  # Paper: 2% below baseline (91% - 2% = 89%)
-        energy_constraint=5000.0,
-        architecture='resnet'  # Using ResNet-20 from approxAI paper
-    )
+
+    # CIFAR-10 Example (commented out - uncomment to run CIFAR-10)
+    # results = run_nas(
+    #     search_algo='bayesian',
+    #     num_trials=20,
+    #     epochs=60,
+    #     use_stl=True,
+    #     quality_constraint=0.89,  # Paper: 2% below baseline (91% - 2% = 89%)
+    #     energy_constraint=5000.0,
+    #     architecture='resnet'
+    # )
 
     # Example: Switch to CNN (uncomment to use)
     # results = run_nas(
@@ -388,14 +390,14 @@ if __name__ == '__main__':
     #     architecture='cnn'
     # )
 
-    # Example: FashionMNIST with ResNet (uncomment to use)
-    # results = run_nas(
-    #     search_algo='bayesian',
-    #     num_trials=20,
-    #     epochs=60,
-    #     use_stl=True,
-    #     quality_constraint=0.90,  # 90% for FashionMNIST (adjust based on baseline)
-    #     energy_constraint=500.0,  # Lower energy than CIFAR-10 (28×28 vs 32×32)
-    #     architecture='resnet',
-    #     dataset='fashionmnist'  # NEW! Switch to FashionMNIST
-    # )
+    # FashionMNIST with ResNet (ACTIVE)
+    results = run_nas(
+        search_algo='bayesian',
+        num_trials=20,
+        epochs=60,
+        use_stl=True,
+        quality_constraint=0.90,  # 90% for FashionMNIST (adjust based on baseline)
+        energy_constraint=500.0,  # Lower energy than CIFAR-10 (28×28 vs 32×32)
+        architecture='resnet',
+        dataset='fashionmnist'  # Running FashionMNIST
+    )
