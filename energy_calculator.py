@@ -110,9 +110,10 @@ def estimate_network_energy(arch, num_operations=1e9, input_size=32):
         # FashionMNIST (input_size=28): Stage 0 (28×28=784), Stage 1 (14×14=196), Stage 2 (7×7=49)
         feature_map_sizes = [input_size * input_size // (2 ** i) for i in range(num_stages)]
 
-        # Initial conv layer (usually 3→16 channels for CIFAR, 3×3 kernel on 32×32)
-        # Assuming first stage handles this
-        in_channels = 3  # RGB input
+        # Initial conv layer input channels
+        # CIFAR-10 (32×32): 3 channels (RGB)
+        # FashionMNIST (28×28): 1 channel (Grayscale)
+        in_channels = 3 if input_size == 32 else 1  # Detect based on input size
 
         for stage_idx in range(num_stages):
             mul_map = arch['mul_map_files'][stage_idx]

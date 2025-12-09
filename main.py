@@ -54,15 +54,15 @@ MULTIPLIERS_ALL = [
     MUL_MAP_PATH + 'mul8u_2V0.bin',    # 0.386 mW, 0.0015% MAE - Pareto-optimal
     # Low error (0.005% - 0.01% MAE)
     MUL_MAP_PATH + 'mul8u_LK8.bin',    # 0.370 mW, 0.0046% MAE - Pareto-optimal
-    MUL_MAP_PATH + 'mul8u_17C8.bin',   # 0.355 mW, 0.0090% MAE - More savings
+    # MUL_MAP_PATH + 'mul8u_17C8.bin',   # 0.355 mW, 0.0090% MAE - More savings
     # Medium error (0.01% - 0.02% MAE)
     MUL_MAP_PATH + 'mul8u_R92.bin',    # 0.345 mW, 0.0170% MAE - Last week's best!
-    # Medium-high error (0.02% - 0.04% MAE)
-    MUL_MAP_PATH + 'mul8u_18UH.bin',   # 0.330 mW, 0.0250% MAE - Aggressive
-    # High error (0.05% - 0.06% MAE)
-    MUL_MAP_PATH + 'mul8u_0AB.bin',    # 0.302 mW, 0.0570% MAE - Highest tested
-    # Very high error (> 0.08% MAE)
-    MUL_MAP_PATH + 'mul8u_197B.bin',   # 0.206 mW, 0.1200% MAE - Extreme savings
+    # Medium-high error (0.02% - 0.04% MAE) - CAUSES FAILURES, COMMENTED OUT
+    # MUL_MAP_PATH + 'mul8u_18UH.bin',   # 0.330 mW, 0.0250% MAE - Causes 65% failures
+    # High error (0.05% - 0.06% MAE) - CAUSES FAILURES, COMMENTED OUT
+    # MUL_MAP_PATH + 'mul8u_0AB.bin',    # 0.302 mW, 0.0570% MAE - Causes failures
+    # Very high error (> 0.08% MAE) - CAUSES FAILURES, COMMENTED OUT
+    # MUL_MAP_PATH + 'mul8u_197B.bin',   # 0.206 mW, 0.1200% MAE - Causes failures
 ]
 
 # Conservative multipliers (MAE < 0.02%) - for initial experiments
