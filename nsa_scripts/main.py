@@ -34,11 +34,7 @@ MULTIPLIERS_ALL = [
     MUL_MAP_PATH + 'mul8u_1JJQ.bin',
     MUL_MAP_PATH + 'mul8u_2V0.bin',
     MUL_MAP_PATH + 'mul8u_LK8.bin',
-    MUL_MAP_PATH + 'mul8u_17C8.bin',
     MUL_MAP_PATH + 'mul8u_R92.bin',
-    MUL_MAP_PATH + 'mul8u_18UH.bin',
-    MUL_MAP_PATH + 'mul8u_0AB.bin',
-    MUL_MAP_PATH + 'mul8u_197B.bin',
 ]
 
 MULTIPLIERS_CONSERVATIVE = MULTIPLIERS_ALL[:5]
@@ -286,14 +282,16 @@ if __name__ == '__main__':
     print("="*70 + "\n")
 
 
+
+
+
     results = run_nas(
         search_algo='bayesian',
         num_trials=20,
         epochs=60,
         use_stl=True,
-        quality_constraint=0.89,
-        energy_constraint=5000.0,
-        architecture='resnet'
+        quality_constraint=0.90,
+        energy_constraint=500.0,
+        architecture='resnet',
+        dataset='fashionmnist'
     )
-
-

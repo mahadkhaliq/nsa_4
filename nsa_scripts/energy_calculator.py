@@ -53,7 +53,7 @@ def estimate_network_energy(arch, num_operations=1e9, input_size=32):
 
         feature_map_sizes = [input_size * input_size // (2 ** i) for i in range(num_stages)]
 
-        in_channels = 3
+        in_channels = 3 if input_size == 32 else 1
 
         for stage_idx in range(num_stages):
             mul_map = arch['mul_map_files'][stage_idx]
