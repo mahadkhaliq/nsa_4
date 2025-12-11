@@ -6,9 +6,7 @@ from tensorflow.keras.layers import (
 )
 from tensorflow.keras.models import Model
 
-# ============================================================================
 # Simple CNN Architecture (Original)
-# ============================================================================
 
 def build_model(arch):
     """Build CNN model with exact Conv2D layers"""
@@ -66,9 +64,7 @@ def build_approx_model(arch):
     return tf.keras.Sequential(layers)
 
 
-# ============================================================================
 # ResNet-20 Architecture (from approxAI paper)
-# ============================================================================
 
 def residual_block_exact(x, filters, stride=1, name=''):
     """Exact residual block with standard Conv2D"""
@@ -127,7 +123,9 @@ def residual_block_approx(x, filters, mul_map_file, stride=1, name=''):
 
 
 def build_resnet20_exact(arch=None, input_shape=(32, 32, 3), num_classes=10):
-    """Build variable ResNet for CIFAR-10 with exact multipliers
+    """Build variable ResNet with exact multipliers
+
+    Supports both CIFAR-style (32×32, 28×28) and ImageNet-style (224×224) architectures.
 
     Args:
         arch: Architecture dict with 'num_stages', 'blocks_per_stage', 'filters_per_stage'
@@ -135,6 +133,10 @@ def build_resnet20_exact(arch=None, input_shape=(32, 32, 3), num_classes=10):
               - Single integer: 3 blocks per stage (OLD)
               - List of integers: [3, 3, 3] variable blocks per stage (NEW)
               If None, uses default ResNet-20: 3 stages, 3 blocks, [16,32,64] filters
+        input_shape: Input image shape
+                     - (32, 32, 3): CIFAR-10 style with 3×3 initial conv
+                     - (28, 28, 1): FashionMNIST style with 3×3 initial conv
+                     - (224, 224, 3): ImageNet style with 7×7 initial conv + maxpool
     """
     # Default to ResNet-20 if no arch specified
     if arch is None:
@@ -153,10 +155,22 @@ def build_resnet20_exact(arch=None, input_shape=(32, 32, 3), num_classes=10):
 
     inputs = Input(shape=input_shape, name='input')
 
-    # Initial conv
-    x = Conv2D(filters_per_stage[0], 3, padding='same', name='init_conv')(inputs)
-    x = BatchNormalization(name='init_bn')(x)
-    x = Activation('relu', name='init_relu')(x)
+    # ImageNet-style vs CIFAR-style initial layers
+    is_imagenet_style = (input_shape[0] == 224)
+
+    if is_imagenet_style:
+        # ImageNet-style: 7×7 conv stride=2 → BatchNorm → ReLU → MaxPool stride=2
+        # 224×224 → 112×112 (conv) → 56×56 (maxpool)
+        x = Conv2D(filters_per_stage[0], 7, strides=2, padding='same', name='init_conv')(inputs)
+        x = BatchNormalization(name='init_bn')(x)
+        x = Activation('relu', name='init_relu')(x)
+        x = tf.keras.layers.MaxPooling2D(pool_size=3, strides=2, padding='same', name='init_maxpool')(x)
+    else:
+        # CIFAR-style: 3×3 conv stride=1 → BatchNorm → ReLU (no maxpool)
+        # 32×32 → 32×32 (no downsampling)
+        x = Conv2D(filters_per_stage[0], 3, padding='same', name='init_conv')(inputs)
+        x = BatchNormalization(name='init_bn')(x)
+        x = Activation('relu', name='init_relu')(x)
 
     # Build stages dynamically with variable blocks per stage
     total_conv_layers = 0
@@ -184,8 +198,9 @@ def build_resnet20_exact(arch=None, input_shape=(32, 32, 3), num_classes=10):
 
 
 def build_resnet20_approx(arch, input_shape=(32, 32, 3), num_classes=10):
-    """Build variable ResNet for CIFAR-10 with approximate multipliers
+    """Build variable ResNet with approximate multipliers
 
+    Supports both CIFAR-style (32×32, 28×28) and ImageNet-style (224×224) architectures.
     Uses heterogeneous multipliers (different per stage) as in approxAI paper.
 
     Args:
@@ -194,6 +209,10 @@ def build_resnet20_approx(arch, input_shape=(32, 32, 3), num_classes=10):
               blocks_per_stage can be:
               - Single integer: 3 blocks per stage (OLD)
               - List of integers: [3, 3, 3] variable blocks per stage (NEW)
+        input_shape: Input image shape
+                     - (32, 32, 3): CIFAR-10 style with 3×3 initial conv
+                     - (28, 28, 1): FashionMNIST style with 3×3 initial conv
+                     - (224, 224, 3): ImageNet style with 7×7 initial conv + maxpool
     """
     num_stages = arch['num_stages']
     blocks_per_stage_raw = arch['blocks_per_stage']
@@ -207,10 +226,23 @@ def build_resnet20_approx(arch, input_shape=(32, 32, 3), num_classes=10):
 
     inputs = Input(shape=input_shape, name='input')
 
-    # Initial conv - keep exact for stability
-    x = Conv2D(filters_per_stage[0], 3, padding='same', name='init_conv')(inputs)
-    x = BatchNormalization(name='init_bn')(x)
-    x = Activation('relu', name='init_relu')(x)
+    # ImageNet-style vs CIFAR-style initial layers
+    is_imagenet_style = (input_shape[0] == 224)
+
+    if is_imagenet_style:
+        # ImageNet-style: 7×7 conv stride=2 → BatchNorm → ReLU → MaxPool stride=2
+        # 224×224 → 112×112 (conv) → 56×56 (maxpool)
+        # Keep initial conv EXACT for stability
+        x = Conv2D(filters_per_stage[0], 7, strides=2, padding='same', name='init_conv')(inputs)
+        x = BatchNormalization(name='init_bn')(x)
+        x = Activation('relu', name='init_relu')(x)
+        x = tf.keras.layers.MaxPooling2D(pool_size=3, strides=2, padding='same', name='init_maxpool')(x)
+    else:
+        # CIFAR-style: 3×3 conv stride=1 → BatchNorm → ReLU (no maxpool)
+        # Keep initial conv EXACT for stability
+        x = Conv2D(filters_per_stage[0], 3, padding='same', name='init_conv')(inputs)
+        x = BatchNormalization(name='init_bn')(x)
+        x = Activation('relu', name='init_relu')(x)
 
     # Build stages dynamically with approximate multipliers and variable blocks
     total_conv_layers = 0

@@ -121,6 +121,24 @@ SEARCH_SPACE_RESNET_FASHIONMNIST = {
     'mul_map_files': MULTIPLIERS_ALL  # Comment out unwanted multipliers above
 }
 
+# Imagenette ResNet Search Space (224×224 RGB input)
+# Imagenette: ~13k training images, ~500 test per class, 10 classes (ImageNet subset)
+# Expected accuracy: 85-92% exact, 82-90% approximate (more challenging than CIFAR-10)
+# ImageNet-style architecture: 4 stages, [64, 128, 256, 512] filters, 7×7 initial conv + maxpool
+SEARCH_SPACE_RESNET_IMAGENETTE = {
+    'num_stages': [4],  # ImageNet standard: 4 stages (56×56 → 28×28 → 14×14 → 7×7)
+    'blocks_per_stage': [
+        [2, 2, 2, 2],   # ResNet-18 (lightweight, 18 layers total)
+        [3, 3, 3, 3],   # ResNet-26 (balanced depth)
+        [2, 3, 4, 3],   # Pyramid (progressive depth)
+        [3, 4, 3, 2],   # Middle-heavy (more capacity in middle stages)
+        [3, 4, 6, 3],   # ResNet-34 variant (deeper, inspired by He et al.)
+        [2, 2, 3, 2],   # Lightweight variant (faster training)
+    ],
+    'base_filters': [64],  # ImageNet standard: [64, 128, 256, 512] filters per stage
+    'mul_map_files': MULTIPLIERS_ALL  # Top 4 multipliers (can comment out high-error ones)
+}
+
 def run_nas(search_algo='random', num_trials=5, epochs=5, use_stl=False,
             quality_constraint=0.70, energy_constraint=50.0, architecture='cnn',
             dataset='cifar10', batch_size=256):
@@ -145,6 +163,10 @@ def run_nas(search_algo='random', num_trials=5, epochs=5, use_stl=False,
     if dataset.lower() == 'fashionmnist':
         search_space = SEARCH_SPACE_RESNET_FASHIONMNIST if use_resnet else SEARCH_SPACE_CNN
         input_shape = (28, 28, 1)  # Grayscale 28×28
+        num_classes = 10
+    elif dataset.lower() == 'imagenette':
+        search_space = SEARCH_SPACE_RESNET_IMAGENETTE if use_resnet else SEARCH_SPACE_CNN
+        input_shape = (224, 224, 3)  # RGB 224×224 (ImageNet-style)
         num_classes = 10
     else:  # Default to CIFAR-10 (backward compatible)
         search_space = SEARCH_SPACE_RESNET if use_resnet else SEARCH_SPACE_CNN

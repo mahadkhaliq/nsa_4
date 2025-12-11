@@ -108,12 +108,28 @@ def estimate_network_energy(arch, num_operations=1e9, input_size=32):
         # Feature map sizes based on input_size (stride-2 downsample per stage)
         # CIFAR-10 (input_size=32): Stage 0 (32×32=1024), Stage 1 (16×16=256), Stage 2 (8×8=64)
         # FashionMNIST (input_size=28): Stage 0 (28×28=784), Stage 1 (14×14=196), Stage 2 (7×7=49)
-        feature_map_sizes = [input_size * input_size // (2 ** i) for i in range(num_stages)]
+        # Imagenette (input_size=224): Stage 0 (56×56=3136), Stage 1 (28×28=784), Stage 2 (14×14=196), Stage 3 (7×7=49)
+        # Note: ImageNet-style ResNet has initial 7×7 conv + MaxPool that reduces 224×224 → 56×56
+        if input_size == 224:
+            # ImageNet-style: initial conv (224→112) + maxpool (112→56), then stages downsample by 2
+            initial_feature_size = 56
+            feature_map_sizes = [initial_feature_size * initial_feature_size // (2 ** i) for i in range(num_stages)]
+        else:
+            # CIFAR-style: direct stride-2 downsampling per stage
+            feature_map_sizes = [input_size * input_size // (2 ** i) for i in range(num_stages)]
 
         # Initial conv layer input channels
         # CIFAR-10 (32×32): 3 channels (RGB)
         # FashionMNIST (28×28): 1 channel (Grayscale)
-        in_channels = 3 if input_size == 32 else 1  # Detect based on input size
+        # Imagenette (224×224): 3 channels (RGB)
+        if input_size == 32:
+            in_channels = 3  # CIFAR-10 RGB
+        elif input_size == 28:
+            in_channels = 1  # FashionMNIST Grayscale
+        elif input_size == 224:
+            in_channels = 3  # Imagenette RGB
+        else:
+            in_channels = 3  # Default to RGB
 
         for stage_idx in range(num_stages):
             mul_map = arch['mul_map_files'][stage_idx]
