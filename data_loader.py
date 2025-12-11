@@ -47,7 +47,7 @@ def load_imagenette(data_dir='./data/imagenette2-320', img_size=224):
     """
     import os
     import numpy as np
-    from tensorflow.keras.preprocessing import image_dataset_from_directory
+    from PIL import Image
 
     # Check if dataset exists
     if not os.path.exists(data_dir):
@@ -60,44 +60,54 @@ def load_imagenette(data_dir='./data/imagenette2-320', img_size=224):
     train_dir = os.path.join(data_dir, 'train')
     val_dir = os.path.join(data_dir, 'val')
 
-    # Load datasets using Keras image_dataset_from_directory
-    train_dataset = image_dataset_from_directory(
-        train_dir,
-        labels='inferred',
-        label_mode='int',
-        image_size=(img_size, img_size),
-        batch_size=None,  # Load all at once
-        shuffle=False
-    )
+    def load_images_from_directory(directory, img_size):
+        """Load all images from directory structure"""
+        images = []
+        labels = []
 
-    val_dataset = image_dataset_from_directory(
-        val_dir,
-        labels='inferred',
-        label_mode='int',
-        image_size=(img_size, img_size),
-        batch_size=None,
-        shuffle=False
-    )
+        # Get sorted class names (subdirectories)
+        class_names = sorted([d for d in os.listdir(directory)
+                            if os.path.isdir(os.path.join(directory, d))])
 
-    # Convert to numpy arrays and normalize
-    x_train = []
-    y_train = []
-    for image, label in train_dataset:
-        x_train.append(image.numpy())
-        y_train.append(label.numpy())
+        print(f"Loading from {directory}...")
+        print(f"Found {len(class_names)} classes: {class_names}")
 
-    x_test = []
-    y_test = []
-    for image, label in val_dataset:
-        x_test.append(image.numpy())
-        y_test.append(label.numpy())
+        for class_idx, class_name in enumerate(class_names):
+            class_dir = os.path.join(directory, class_name)
+            image_files = [f for f in os.listdir(class_dir)
+                          if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
 
-    x_train = np.array(x_train).astype('float32') / 255.0
-    y_train = np.array(y_train).astype('float32')
-    x_test = np.array(x_test).astype('float32') / 255.0
-    y_test = np.array(y_test).astype('float32')
+            print(f"  Class {class_idx} ({class_name}): {len(image_files)} images")
 
-    print(f"Imagenette loaded: Train={x_train.shape}, Test={x_test.shape}")
+            for img_file in image_files:
+                img_path = os.path.join(class_dir, img_file)
+                try:
+                    # Load and resize image
+                    img = Image.open(img_path).convert('RGB')
+                    img = img.resize((img_size, img_size), Image.BILINEAR)
+                    img_array = np.array(img, dtype='float32')
+
+                    images.append(img_array)
+                    labels.append(class_idx)
+                except Exception as e:
+                    print(f"    Warning: Failed to load {img_path}: {e}")
+                    continue
+
+        return np.array(images), np.array(labels)
+
+    # Load training and validation data
+    x_train, y_train = load_images_from_directory(train_dir, img_size)
+    x_test, y_test = load_images_from_directory(val_dir, img_size)
+
+    # Normalize to [0, 1]
+    x_train = x_train.astype('float32') / 255.0
+    x_test = x_test.astype('float32') / 255.0
+    y_train = y_train.astype('float32')
+    y_test = y_test.astype('float32')
+
+    print(f"\nImagenette loaded successfully!")
+    print(f"  Training: {x_train.shape} images, {y_train.shape} labels")
+    print(f"  Validation: {x_test.shape} images, {y_test.shape} labels")
 
     return (x_train, y_train), (x_test, y_test)
 
