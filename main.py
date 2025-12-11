@@ -412,14 +412,31 @@ if __name__ == '__main__':
     #     architecture='cnn'
     # )
 
-    # FashionMNIST with ResNet (ACTIVE)
+    # FashionMNIST with ResNet (commented out)
+    # results = run_nas(
+    #     search_algo='bayesian',
+    #     num_trials=20,
+    #     epochs=60,
+    #     use_stl=True,
+    #     quality_constraint=0.90,  # 90% for FashionMNIST (adjust based on baseline)
+    #     energy_constraint=500.0,  # Lower energy than CIFAR-10 (28×28 vs 32×32)
+    #     architecture='resnet',
+    #     dataset='fashionmnist'  # Running FashionMNIST
+    # )
+
+    # Imagenette with ImageNet-style ResNet (ACTIVE)
+    # Dataset: 224×224×3 RGB, 10 classes (ImageNet subset)
+    # Architecture: 4-stage ResNet, [64,128,256,512] filters, 7×7 initial conv + maxpool
+    # Expected: 82-90% accuracy (approx), 50-80k µJ energy
+    # Training time: 10-20× longer than CIFAR-10 per epoch
     results = run_nas(
         search_algo='bayesian',
-        num_trials=20,
-        epochs=60,
+        num_trials=15,              # Fewer trials due to longer training time
+        epochs=50,                  # More epochs needed for 224×224 convergence
         use_stl=True,
-        quality_constraint=0.90,  # 90% for FashionMNIST (adjust based on baseline)
-        energy_constraint=500.0,  # Lower energy than CIFAR-10 (28×28 vs 32×32)
+        quality_constraint=0.85,    # 85% accuracy target (Imagenette is harder than CIFAR-10)
+        energy_constraint=80000.0,  # 80 mJ = 80,000 µJ (50-100× more than CIFAR-10)
         architecture='resnet',
-        dataset='fashionmnist'  # Running FashionMNIST
+        dataset='imagenette',       # Running Imagenette (224×224 ImageNet-style)
+        batch_size=128              # Reduced from 256 to avoid GPU OOM with 224×224 images
     )
