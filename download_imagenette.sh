@@ -20,9 +20,9 @@ if [ -d "imagenette2-320" ]; then
     if [ -d "imagenette2-320/train" ] && [ -d "imagenette2-320/val" ]; then
         echo "✓ Dataset structure looks good (train/ and val/ directories found)"
 
-        # Count images
-        train_count=$(find imagenette2-320/train -type f \( -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" \) | wc -l)
-        val_count=$(find imagenette2-320/val -type f \( -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" \) | wc -l)
+        # Count images (case-insensitive)
+        train_count=$(find imagenette2-320/train -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.JPEG" \) 2>/dev/null | wc -l)
+        val_count=$(find imagenette2-320/val -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.JPEG" \) 2>/dev/null | wc -l)
 
         echo "  Training images: $train_count (expected: ~9,469)"
         echo "  Validation images: $val_count (expected: ~3,925)"
@@ -60,9 +60,9 @@ tar -xzf imagenette2-320.tgz
 if [ -d "imagenette2-320/train" ] && [ -d "imagenette2-320/val" ]; then
     echo "✓ Extraction successful!"
 
-    # Count images
-    train_count=$(find imagenette2-320/train -type f \( -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" \) | wc -l)
-    val_count=$(find imagenette2-320/val -type f \( -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" \) | wc -l)
+    # Count images (case-insensitive)
+    train_count=$(find imagenette2-320/train -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.JPEG" \) 2>/dev/null | wc -l)
+    val_count=$(find imagenette2-320/val -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.JPEG" \) 2>/dev/null | wc -l)
 
     echo ""
     echo "Dataset statistics:"
@@ -70,16 +70,11 @@ if [ -d "imagenette2-320/train" ] && [ -d "imagenette2-320/val" ]; then
     echo "  Validation images: $val_count"
     echo "  Total size: $(du -sh imagenette2-320 | cut -f1)"
 
-    # Clean up tar file
+    # Clean up tar file (auto-delete to save space)
     echo ""
-    read -p "Delete imagenette2-320.tgz to save space? (y/n) " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        rm imagenette2-320.tgz
-        echo "✓ Cleaned up tar file"
-    else
-        echo "Keeping tar file for backup"
-    fi
+    echo "Cleaning up tar file to save space..."
+    rm -f imagenette2-320.tgz
+    echo "✓ Cleaned up tar file"
 
     echo ""
     echo "=================================================="
